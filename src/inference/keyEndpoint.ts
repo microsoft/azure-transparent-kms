@@ -107,14 +107,24 @@ export const key = (
   }
 
   // Check kid
-  let kid = serviceRequest.body?.["kid"];
+  let kidString = serviceRequest.query?.["kid"];
+  let kid: number | undefined;
   let keyItem: IKeyItem | undefined;
-  if (kid === undefined) {
+  if (kidString === undefined) {
     [kid, keyItem] = hpkeKeyMap.latestItem();
     if (keyItem === undefined) {
       return ServiceResult.Failed<string>(
         { errorMessage: `${name}: No keys in store` },
         400,
+      );
+    }
+  } else {
+    kid = parseInt(kidString, 10);
+    keyItem = hpkeKeyMap.store.get(kid) as IKeyItem;
+    if (keyItem === undefined) {
+      return ServiceResult.Failed<string>(
+        { errorMessage: `${name}: kid ${kid} not found in store` },
+        404,
       );
     }
   }

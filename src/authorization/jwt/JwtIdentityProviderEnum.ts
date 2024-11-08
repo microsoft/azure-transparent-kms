@@ -9,6 +9,7 @@ export enum JwtIdentityProviderEnum {
   Demo = "http://Demo-jwt-issuer",
   MAA_deus2 = "https://sharedeus2.eus2.attest.azure.net",
   MAA_NoSecureBootTyFu = "https://maanosecureboottestyfu.eus.attest.azure.net",
-  MAA_NoSecureBootWeu = "https://accnosecurebootmaawesteu.weu.attest.azure.net",
-  MAA_NoSecureBootEus = "https://accnosecurebootmaa.eus2.attest.azure.net",
+  MAA_ConfInferenceTestEus2 = "https://confinfermaaeus2test.eus2.test.attest.azure.net",
+  // MAA_NoSecureBootWeu = "https://accnosecurebootmaawesteu.weu.attest.azure.net",
+  // MAA_NoSecureBootEus = "https://accnosecurebootmaa.eus2.attest.azure.net",
 }

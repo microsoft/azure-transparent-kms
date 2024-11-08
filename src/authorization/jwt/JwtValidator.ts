@@ -38,23 +38,32 @@ export class JwtValidator implements IValidatorService {
       this.logContext
     );
     this.identityProviders.set(
-      JwtIdentityProviderEnum.MAA_NoSecureBootWeu,
+      JwtIdentityProviderEnum.MAA_ConfInferenceTestEus2,
       new MsJwtProvider("JwtMaaProvider", this.logContext),
     );
     Logger.debug(
-      "JwtIdentityProviderEnum.MAA_NoSecureBootWeu",
-      JwtIdentityProviderEnum.MAA_NoSecureBootWeu,
+      "JwtIdentityProviderEnum.MAA_ConfInferenceTestEus2",
+      JwtIdentityProviderEnum.MAA_ConfInferenceTestEus2,
       this.logContext
     );
-    this.identityProviders.set(
-      JwtIdentityProviderEnum.MAA_NoSecureBootEus,
-      new MsJwtProvider("JwtMaaProvider", this.logContext),
-    );
-    Logger.debug(
-      "JwtIdentityProviderEnum.MAA_NoSecureBootEus",
-      JwtIdentityProviderEnum.MAA_NoSecureBootEus,
-      this.logContext
-    );
+    // this.identityProviders.set(
+    //   JwtIdentityProviderEnum.MAA_NoSecureBootWeu,
+    //   new MsJwtProvider("JwtMaaProvider", this.logContext),
+    // );
+    // Logger.debug(
+    //   "JwtIdentityProviderEnum.MAA_NoSecureBootWeu",
+    //   JwtIdentityProviderEnum.MAA_NoSecureBootWeu,
+    //   this.logContext
+    // );
+    // this.identityProviders.set(
+    //   JwtIdentityProviderEnum.MAA_NoSecureBootEus,
+    //   new MsJwtProvider("JwtMaaProvider", this.logContext),
+    // );
+    // Logger.debug(
+    //   "JwtIdentityProviderEnum.MAA_NoSecureBootEus",
+    //   JwtIdentityProviderEnum.MAA_NoSecureBootEus,
+    //   this.logContext
+    // );
     this.identityProviders.set(
       JwtIdentityProviderEnum.MS_AAD,
       new MsJwtProvider("JwtProvider", this.logContext),

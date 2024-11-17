@@ -16,6 +16,64 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
     "x-ms-attestation-type": ["snp"],
   };
 
+  private static contains(
+    o1: number | string | boolean | Record<string, any>, 
+    o2: number | string | boolean | Record<string, any>
+  ): boolean 
+  {//Tien: check if o1 is a subset of o2
+    // If both values are primitive types (number, string, etc.), compare them directly
+    if (typeof o1 !== 'object' || o1 === null || typeof o2 !== 'object' || o2 === null) {
+      if (typeof o1 !== typeof o2) {
+        return false;
+      }
+      return o1 === o2
+    }
+    // Both are objects, we compare keys
+    for (let key in o1) {
+      if (o2.hasOwnProperty(key)) {
+          if (!KeyReleasePolicy.contains(o1[key], o2[key])) {
+            return false;
+          }
+      }  
+      else {
+        // If key in o1 does not exist in o2, return false
+        return false;
+      }
+    }
+    // All checks passed, return true
+    return true;
+  }
+
+  private static compare( //Tien: check if all values in o1 (type) are smaller than or equal to the corresponding values in o2
+    type: string,
+    o1: number | string | Record<string, any>, 
+    o2: number | string | Record<string, any>
+  ): boolean 
+  {//Tien: check if o1 is a subset of o2
+    // If both values are primitive types (number, string, etc.), compare them directly
+    if (typeof o1 !== 'object' || o1 === null || typeof o2 !== 'object' || o2 === null) {
+      if (typeof o1 !== typeof o2) {
+        return false;
+      }
+      if (type === "gte") return o2 >= o1;
+      return o2 > o1;
+    }
+    // Both are objects, we compare keys
+    for (let key in o1) {
+      if (o2.hasOwnProperty(key)) {
+          if (!KeyReleasePolicy.compare(type, o1[key], o2[key])) {
+            return false;
+          }
+      }  
+      else {
+        // If key in o1 does not exist in o2, return false
+        return false;
+      }
+    }
+    // All checks passed, return true
+    return true;
+  }
+
   private static validateKeyReleasePolicyClaims(
     keyReleasePolicyClaims: IKeyReleasePolicySnpProps,
     attestationClaims: IAttestationReport,
@@ -60,7 +118,7 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
       if (
         policyValue.filter((p) => {
           Logger.debug(`Check if policy value ${p} === ${attestationValue}`, logContext);
-          return p.toString() === attestationValue.toString();
+          return JSON.stringify(p) === JSON.stringify(attestationValue);//Tien updated
         }).length === 0
       ) {
         return ServiceResult.Failed<string>(
@@ -98,7 +156,6 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
         logContext,
       );
     }
-    const gte = type === "gte";
     for (let inx = 0; inx < Object.keys(keyReleasePolicyClaims).length; inx++) {
       const key = Object.keys(keyReleasePolicyClaims)[inx];
 
@@ -128,6 +185,7 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
           logContext
         );
       }
+
       if (
         typeof policyValue !== "number" &&
         (typeof policyValue !== "string" || isNaN(parseFloat(policyValue)))
@@ -159,34 +217,18 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
         attestationValue = parseFloat(attestationValue);
       }
 
-      if (gte) {
-        Logger.info(
-          `Checking if attestation value ${attestationValue} is greater than or equal to policy value ${policyValue}`,
+      Logger.info(
+        `Checking if attestation value ${attestationValue} is greater than (or equal) to policy value ${policyValue}`,
+        logContext,
+      );
+      if (!this.compare(type, policyValue, attestationValue)) {
+        return ServiceResult.Failed<string>(
+          {
+            errorMessage: `Attestation claim ${key}, value ${attestationValue} is not greater than (or equal) to policy value ${policyValue}`,
+          },
+          400,
           logContext,
         );
-        if (attestationValue >= policyValue === false) {
-          return ServiceResult.Failed<string>(
-            {
-              errorMessage: `Attestation claim ${key}, value ${attestationValue} is not greater than or equal to policy value ${policyValue}`,
-            },
-            400,
-            logContext,
-          );
-        }
-      } else {
-        Logger.info(
-          `Checking if attestation value ${attestationValue} is greater than policy value ${policyValue}`,
-          logContext,
-        );
-        if (attestationValue > policyValue === false) {
-          return ServiceResult.Failed<string>(
-            {
-              errorMessage: `Attestation claim ${key}, value ${attestationValue} is not greater than policy value ${policyValue}`,
-            },
-            400,
-            logContext,
-          );
-        }
       }
     }
     return ServiceResult.Succeeded<IAttestationReport>(attestationClaims, undefined, logContext);

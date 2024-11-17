@@ -56,6 +56,15 @@ export class JwtValidator implements IValidatorService {
       this.logContext
     );
     this.identityProviders.set(
+      JwtIdentityProviderEnum.MAA_NoSecureBootIntgTest,
+      new MsJwtProvider("JwtMaaProvider", this.logContext),
+    );
+    Logger.debug(
+      "JwtIdentityProviderEnum.MAA_NoSecureBootIntgTest",
+      JwtIdentityProviderEnum.MAA_NoSecureBootIntgTest,
+      this.logContext
+    );
+    this.identityProviders.set(
       JwtIdentityProviderEnum.MS_AAD,
       new MsJwtProvider("JwtProvider", this.logContext),
     );

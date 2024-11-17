@@ -222,7 +222,7 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
         `Checking if attestation value ${attestationValue} is greater than (or equal) to policy value ${policyValue}`,
         logContext,
       );
-      if (!this.checkValuesLte(type, policyValue, attestationValue)) {
+      if (!KeyReleasePolicy.checkValuesLte(type, policyValue, attestationValue)) {
         return ServiceResult.Failed<string>(
           {
             errorMessage: `Attestation claim ${key}, value ${attestationValue} is not greater than (or equal) to policy value ${policyValue}`,

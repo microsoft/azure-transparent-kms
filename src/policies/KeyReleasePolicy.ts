@@ -118,7 +118,8 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
       if (
         policyValue.filter((p) => {
           Logger.debug(`Check if policy value ${p} === ${attestationValue}`, logContext);
-          return JSON.stringify(p) === JSON.stringify(attestationValue);//Tien updated
+          // return JSON.stringify(p) === JSON.stringify(attestationValue);//Tien updated
+          return KeyReleasePolicy.contains(p, attestationValue);
         }).length === 0
       ) {
         return ServiceResult.Failed<string>(

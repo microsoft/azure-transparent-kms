@@ -16,11 +16,11 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
     "x-ms-attestation-type": ["snp"],
   };
 
-  private static contains(
+  private static checkSubset(//Tien: check if o1 is a subset of o2
     o1: number | string | boolean | Record<string, any>, 
     o2: number | string | boolean | Record<string, any>
   ): boolean 
-  {//Tien: check if o1 is a subset of o2
+  {
     // If both values are primitive types (number, string, etc.), compare them directly
     if (typeof o1 !== 'object' || o1 === null || typeof o2 !== 'object' || o2 === null) {
       if (typeof o1 !== typeof o2) {
@@ -31,7 +31,7 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
     // Both are objects, we compare keys
     for (let key in o1) {
       if (o2.hasOwnProperty(key)) {
-          if (!KeyReleasePolicy.contains(o1[key], o2[key])) {
+          if (!KeyReleasePolicy.checkSubset(o1[key], o2[key])) {
             return false;
           }
       }  
@@ -44,7 +44,7 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
     return true;
   }
 
-  private static compare( //Tien: check if all values in o1 (type) are smaller than or equal to the corresponding values in o2
+  private static checkValuesLte( //Tien: check if all values in o1 (type) are smaller than or equal to the corresponding values in o2
     type: string,
     o1: number | string | Record<string, any>, 
     o2: number | string | Record<string, any>
@@ -61,7 +61,7 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
     // Both are objects, we compare keys
     for (let key in o1) {
       if (o2.hasOwnProperty(key)) {
-          if (!KeyReleasePolicy.compare(type, o1[key], o2[key])) {
+          if (!KeyReleasePolicy.checkValuesLte(type, o1[key], o2[key])) {
             return false;
           }
       }  
@@ -119,7 +119,7 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
         policyValue.filter((p) => {
           Logger.debug(`Check if policy value ${p} === ${attestationValue}`, logContext);
           // return JSON.stringify(p) === JSON.stringify(attestationValue);//Tien updated
-          return KeyReleasePolicy.contains(p, attestationValue);
+          return KeyReleasePolicy.checkSubset(p, attestationValue);
         }).length === 0
       ) {
         return ServiceResult.Failed<string>(
@@ -222,7 +222,7 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
         `Checking if attestation value ${attestationValue} is greater than (or equal) to policy value ${policyValue}`,
         logContext,
       );
-      if (!this.compare(type, policyValue, attestationValue)) {
+      if (!this.checkValuesLte(type, policyValue, attestationValue)) {
         return ServiceResult.Failed<string>(
           {
             errorMessage: `Attestation claim ${key}, value ${attestationValue} is not greater than (or equal) to policy value ${policyValue}`,

@@ -100,7 +100,6 @@ actions.set(
 
       const CLAIMS = {
         secureboot: "boolean",
-        "tien-test": "string",
         "x-ms-azurevm-os-provisioning": {
           "node-policy-identity": {
             "eventVersion": "number",
@@ -198,7 +197,7 @@ actions.set(
             item.forEach((i) => {
               console.log(`[INFO] [scope=set_key_release_policy->add] KRP add ${type}=>Adding ${i} to ${key}`);
               // Only push if the element is not already in the array
-              if (!includes(items[key],i)) {//Tien: need to update this for nested claims.
+              if (!includes(items[key],i)) {
                 items[key].push(i);
               }
             });
@@ -319,16 +318,16 @@ actions.set(
               `[ERROR] [scope=set_key_release_policy->remove] KRP remove ${type}=>The claim ${key} is not an allowed claim`,
             );
           }
-          let item = claims[key];//Tien: for tien-test:2 example. key = tien-test, item = [2]
+          let item = claims[key];
           // Make sure item is always an array
           if (!Array.isArray(item)) {
             item = [item];
           }
 
-          if (items[key] !== undefined) {//Tien to look into this.
-            item.forEach((i) => {//Tien: item is an array, so i is an element of the array. For examplem: item = [1,3,4,2]. What about nested object?
+          if (items[key] !== undefined) {
+            item.forEach((i) => {
               console.log(`[INFO] [scope=set_key_release_policy->remove] KRP remove ${type}=>Removing ${i} from ${key}`);
-              items[key] = items[key].filter((value) => !isEqual(value, i));//Tien: create a new array with all elements that are not equal to i
+              items[key] = items[key].filter((value) => !isEqual(value, i));
               if (items[key].length === 0) {
                 delete items[key];
               }

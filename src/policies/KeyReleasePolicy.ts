@@ -46,7 +46,7 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
     return true;
   }
 
-  private static checkValuesLte( //Check if all values in o1 (type) are smaller than or equal to the corresponding values in o2
+  private static checkValuesLte( //Check if all values in o1 are smaller than or equal to the corresponding values in o2
     type: string,
     o1: number | string | Record<string, any>, 
     o2: number | string | Record<string, any>

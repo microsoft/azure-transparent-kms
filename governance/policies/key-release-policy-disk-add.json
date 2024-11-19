@@ -1,0 +1,35 @@
+{
+  "actions": [
+    {
+      "name": "set_key_release_policy",
+      "args": {
+        "service": "tien-test",
+        "type": "add",
+        "claims": {
+          "x-ms-azurevm-os-provisioning": {
+            "node-policy-identity": {
+              "eventVersion": "1",
+              "policyId": "openai-whisper",
+              "signer": "8fe6e7a314b8695b21710cebf0265e8d7bbaabde26f431c407faf16fcbd6b924"
+            },
+            "os-image-identity": {
+              "diskId": "singularity.ubuntu-22.04",
+              "eventVersion" : "1",
+              "signer": "f9cce5b7bdc2aaacfc4c78cb2b7515459aded8149287b74667bb2f178b0cf7b9"
+            }
+            }
+          },
+        "gte": {
+          "x-ms-azurevm-os-provisioning": {
+            "node-policy-identity": {
+              "svn": "1"
+            },
+            "os-image-identity": {
+              "svn": "1"
+            }
+            }
+          }
+      }
+    }
+  ]
+}

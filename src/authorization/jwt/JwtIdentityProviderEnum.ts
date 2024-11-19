@@ -11,4 +11,5 @@ export enum JwtIdentityProviderEnum {
   MAA_NoSecureBootTyFu = "https://maanosecureboottestyfu.eus.attest.azure.net",
   MAA_NoSecureBootWeu = "https://accnosecurebootmaawesteu.weu.attest.azure.net",
   MAA_NoSecureBootEus = "https://accnosecurebootmaa.eus2.attest.azure.net",
+  MAA_NoSecureBootInteTest = "https://confinfermaaeus2test.eus2.test.attest.azure.net",
 }

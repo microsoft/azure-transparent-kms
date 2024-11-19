@@ -88,8 +88,32 @@ actions.set(
       checkType(args.claims, "object");
     },
     function (args) {
+      // Helper function to check equality of two objects
+      function isEqual(obj1, obj2) {
+        return JSON.stringify(obj1) === JSON.stringify(obj2);
+      }
+      // Helper function to check if an array contains an object
+      function includes(array, obj) {
+        return array.some((el) => JSON.stringify(el) === JSON.stringify(obj));
+      }
+
+
       const CLAIMS = {
         secureboot: "boolean",
+        "x-ms-azurevm-os-provisioning": {
+          "node-policy-identity": {
+            "eventVersion": "number",
+            "policyId": "string",
+            "signer": "string",
+            "svn": "number",
+          },
+          "os-image-identity": {
+            "diskId": "string",
+            "eventVersion" : "number",
+            "signer": "string",
+            "svn": "number",
+          }
+        },
         "x-ms-attestation-type": "string",
         "x-ms-azurevm-attestation-protocol-ver": "string",
         "x-ms-azurevm-attested-pcrs": "number[]",
@@ -173,7 +197,7 @@ actions.set(
             item.forEach((i) => {
               console.log(`[INFO] [scope=set_key_release_policy->add] KRP add ${type}=>Adding ${i} to ${key}`);
               // Only push if the element is not already in the array
-              if (!items[key].includes(i)) {
+              if (!includes(items[key],i)) {
                 items[key].push(i);
               }
             });
@@ -303,7 +327,7 @@ actions.set(
           if (items[key] !== undefined) {
             item.forEach((i) => {
               console.log(`[INFO] [scope=set_key_release_policy->remove] KRP remove ${type}=>Removing ${i} from ${key}`);
-              items[key] = items[key].filter((value) => value !== i);
+              items[key] = items[key].filter((value) => !isEqual(value, i));
               if (items[key].length === 0) {
                 delete items[key];
               }
@@ -318,7 +342,7 @@ actions.set(
           }
         });
 
-        // Safe into KV
+        // Save into KV
         console.log(`[INFO] [scope=set_key_release_policy->remove] KRP remove ${type}=>items: `, items);
         let jsonItems = JSON.stringify(items);
         console.log(

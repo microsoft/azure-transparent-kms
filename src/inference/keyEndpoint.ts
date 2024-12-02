@@ -133,6 +133,15 @@ export const key = (
         logContext,
       );
     }
+  } else {
+    kid = parseInt(kidString, 10);
+    keyItem = hpkeKeyMap.store.get(kid) as IKeyItem;
+    if (keyItem === undefined) {
+      return ServiceResult.Failed<string>(
+        { errorMessage: `${name}: kid ${kid} not found in store` },
+        404,
+      );
+    }
   }
 
   const receipt = hpkeKeyMap.receipt(kid);

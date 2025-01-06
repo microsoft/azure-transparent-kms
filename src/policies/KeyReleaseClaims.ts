@@ -1,7 +1,11 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { ccf } from "@microsoft/ccf-app/global";
 import { keyReleasePolicyMap } from "../repositories/Maps";
 
-const keyReleaseMapName = "public:ccf.gov.policies.key_release";
+
+const keyReleaseMapName = "public:kms.policies.key_release";
 const CLAIMS = {
     "x-ms-attestation-type": "string",
     "x-ms-compliance-status": "string",
@@ -30,7 +34,7 @@ const CLAIMS = {
     "x-ms-ver": "string",
 };
 
-export class KeyReleasePolicyClaims {
+export class KeyReleaseClaims {
 
     static add(
         map: typeof keyReleasePolicyMap,
@@ -41,8 +45,8 @@ export class KeyReleasePolicyClaims {
 
         // Get all claims for the type from the KV
         const keyBuf = ccf.strToBuf(type);
-        if (ccf.kv[keyReleaseMapName].has(keyBuf)) {
-            const itemsBuf = ccf.kv[keyReleaseMapName].get(keyBuf);
+        if (keyReleasePolicyMap.has(keyBuf)) {
+            const itemsBuf = keyReleasePolicyMap.get(keyBuf);
             if (itemsBuf) { // Ensure itemsBuf is not undefined
                 items = JSON.parse(ccf.bufToStr(itemsBuf));
             } else {
@@ -76,7 +80,7 @@ export class KeyReleasePolicyClaims {
         // Save into KV
         const jsonItems = JSON.stringify(items);
         const jsonItemsBuf = ccf.strToBuf(jsonItems);
-        ccf.kv[keyReleaseMapName].set(keyBuf, jsonItemsBuf);
+        keyReleasePolicyMap.set(keyBuf, jsonItemsBuf);
         console.log(`KRP add ${type} => Updated claims: ${jsonItems}`);
     }
 
@@ -90,8 +94,8 @@ export class KeyReleasePolicyClaims {
 
         // Get all claims for the type from the KV
         const keyBuf = ccf.strToBuf(type);
-        if (ccf.kv[keyReleaseMapName].has(keyBuf)) {
-            const itemsBuf = ccf.kv[keyReleaseMapName].get(keyBuf);
+        if (keyReleasePolicyMap.has(keyBuf)) {
+            const itemsBuf = keyReleasePolicyMap.get(keyBuf);
             if (itemsBuf) {
                 items = JSON.parse(ccf.bufToStr(itemsBuf));
             } else {
@@ -131,6 +135,6 @@ export class KeyReleasePolicyClaims {
         console.log(`KRP remove ${type} => items: ${JSON.stringify(items)}`);
         const jsonItems = JSON.stringify(items);
         const jsonItemsBuf = ccf.strToBuf(jsonItems);
-        ccf.kv[keyReleaseMapName].set(keyBuf, jsonItemsBuf);
+        keyReleasePolicyMap.set(keyBuf, jsonItemsBuf);
     }
 }

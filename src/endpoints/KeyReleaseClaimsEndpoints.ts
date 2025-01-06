@@ -2,7 +2,7 @@ import * as ccfapp from "@microsoft/ccf-app";
 import { enableEndpoint } from "../utils/Tooling";
 import { ServiceResult } from "../utils/ServiceResult";
 import { ServiceRequest } from "../utils/ServiceRequest";
-import { KeyReleasePolicyClaims } from "../policies/KeyReleaseClaims";
+import { KeyReleaseClaims } from "../policies/KeyReleaseClaims";
 import { keyReleasePolicyMap } from "../repositories/Maps";
 import { LogContext } from "../utils/Logger";
 
@@ -15,7 +15,7 @@ enableEndpoint();
  * @param request A CCF request containing the operation type and claims.
  * @returns A ServiceResult with the operation status.
  */
-export const setKeyReleasePolicy = (
+export const setKeyReleaseClaims = (
   request: ccfapp.Request<{ type: string; claims: Record<string, any> }>,
 ): ServiceResult<string> => {
 
@@ -38,9 +38,9 @@ export const setKeyReleasePolicy = (
 
   try {
     if (type === "add") {
-        KeyReleasePolicyClaims.add(keyReleasePolicyMap, "claims", claims);
+        KeyReleaseClaims.add(keyReleasePolicyMap, "claims", claims);
     } else if (type === "remove") {
-        KeyReleasePolicyClaims.remove(keyReleasePolicyMap, "claims", claims);
+        KeyReleaseClaims.remove(keyReleasePolicyMap, "claims", claims);
     } else {
       return ServiceResult.Failed<string>({ errorMessage: `Unsupported operation: ${type}` }, 400, logContext);
     }

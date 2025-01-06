@@ -5,7 +5,6 @@ import { ccf } from "@microsoft/ccf-app/global";
 import { keyReleasePolicyMap } from "../repositories/Maps";
 
 
-const keyReleaseMapName = "public:kms.policies.key_release";
 const CLAIMS = {
     "x-ms-attestation-type": "string",
     "x-ms-compliance-status": "string",

@@ -78,6 +78,20 @@ const token = (req: Request, res: Response) => {
     "x-ms-ver": "1.0",
     "x-ms-azurevm-debuggersdisabled": true,
     "x-ms-azurevm-osversion-major": 22,
+    "x-ms-azurevm-os-provisioning": {
+      "node-policy-identity": {
+        "eventVersion": "1",
+        "policyId": "openai-whisper",
+        "signer": "8fe6e7a314b8695b21710cebf0265e8d7bbaabde26f431c407faf16fcbd6b924",
+        "svn": "1"
+      },
+      "os-image-identity": {
+        "diskId": "singularity.ubuntu-22.04",
+        "eventVersion": "1",
+        "signer": "f9cce5b7bdc2aaacfc4c78cb2b7515459aded8149287b74667bb2f178b0cf7b9",
+        "svn": "1"
+      }
+    },
     "x-ms-runtime": { "keys": [wrappingKey] },
     ...req.query, // Merge query parameters into the payload
   };

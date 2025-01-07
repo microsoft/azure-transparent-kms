@@ -19,16 +19,16 @@ export const setKeyRotationPolicy = (
     request: ccfapp.Request<{ key_rotation_policy: Record<string, any> }>,
   ): ServiceResult<string> => {
     const logContext = new LogContext().appendScope("keyRotationPolicyEndpoint");
-    const serviceRequest = new ServiceRequest<{ type: string; key_rotation_policy: Record<string, any> }>(logContext, request);
+    const serviceRequest = new ServiceRequest<{ key_rotation_policy: Record<string, any> }>(logContext, request);
   
     // Check if caller has a valid identity
     const [_, isValidIdentity] = serviceRequest.isAuthenticated();
     if (isValidIdentity.failure) return isValidIdentity;
   
     const { body } = serviceRequest;
-    if (!body || !body.type || !body.key_rotation_policy) {
+    if (!body ||  !body.key_rotation_policy) {
       return ServiceResult.Failed<string>(
-        { errorMessage: "Invalid request body: 'type' and 'claims' are required." },
+        { errorMessage: "Invalid request body: 'key_rotation_policy' is required." },
         400,
         logContext
       );

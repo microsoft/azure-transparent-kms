@@ -3,7 +3,7 @@ import { enableEndpoint } from "../utils/Tooling";
 import { ServiceResult } from "../utils/ServiceResult";
 import { ServiceRequest } from "../utils/ServiceRequest";
 import { KeyRotationPolicy } from "../policies/KeyRotationPolicy";
-import { keyRotationPolicyMap } from "../repositories/Maps";
+import { keyRotationPolicySet } from "../repositories/Maps";
 import { LogContext } from "../utils/Logger";
 import { IKeyRotationPolicy } from "../policies/IKeyRotationPolicy";
 
@@ -34,13 +34,16 @@ export const setKeyRotationPolicy = (
             logContext
         );
     }
+
     const { key_rotation_policy } = body;
+    // Assert the type of key_rotation_policy
+    const policy: IKeyRotationPolicy = key_rotation_policy as IKeyRotationPolicy;
 
 
     try {
         // Validate and apply the policy
-        KeyRotationPolicy.validate(key_rotation_policy);
-        KeyRotationPolicy.apply(keyRotationPolicyMap, key_rotation_policy);
+        KeyRotationPolicy.validate(policy);
+        KeyRotationPolicy.apply(keyRotationPolicySet, policy);
 
         return ServiceResult.Succeeded<string>("Key rotation policy set successfully.", logContext);
     } catch (error: any) {
@@ -63,7 +66,7 @@ export const getKeyRotationPolicy = (
     if (isValidIdentity.failure) return isValidIdentity;
 
     try {
-        const policy = KeyRotationPolicy.get(keyRotationPolicyMap);
+        const policy = KeyRotationPolicy.get(keyRotationPolicySet);
 
         if (!policy) {
             return ServiceResult.Failed<string>({ errorMessage: "Key rotation policy not found." }, 400, logContext);

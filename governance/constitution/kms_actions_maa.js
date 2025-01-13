@@ -90,6 +90,14 @@ actions.set(
     function (args) {
       const CLAIMS = {
         secureboot: "boolean",
+        "x-ms-azurevm-os-provisioning.node-policy-identity.eventVersion": "number",
+        "x-ms-azurevm-os-provisioning.node-policy-identity.policyId": "string",
+        "x-ms-azurevm-os-provisioning.node-policy-identity.signer": "string",
+        "x-ms-azurevm-os-provisioning.node-policy-identity.svn": "number",
+        "x-ms-azurevm-os-provisioning.os-image-identity.diskId": "string",
+        "x-ms-azurevm-os-provisioning.os-image-identity.eventVersion": "number",
+        "x-ms-azurevm-os-provisioning.os-image-identity.signer": "string",
+        "x-ms-azurevm-os-provisioning.os-image-identity.svn": "number",
         "x-ms-attestation-type": "string",
         "x-ms-azurevm-attestation-protocol-ver": "string",
         "x-ms-azurevm-attested-pcrs": "number[]",
@@ -318,7 +326,7 @@ actions.set(
           }
         });
 
-        // Safe into KV
+        // Save into KV
         console.log(`[INFO] [scope=set_key_release_policy->remove] KRP remove ${type}=>items: `, items);
         let jsonItems = JSON.stringify(items);
         console.log(

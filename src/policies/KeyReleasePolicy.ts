@@ -15,7 +15,21 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
   public claims = {
     "x-ms-attestation-type": ["snp"],
   };
-
+  //This helper method flattens the object to a single level
+  private static flattenObject(obj: Record<string, any>): Record<string, any> {
+    const res: Record<string, any> = {};
+    for (const k in obj) {
+        if (typeof obj[k] === "object" && obj[k] !== null) {
+            const sub = KeyReleasePolicy.flattenObject(obj[k]);
+            for (const j in sub) {
+                res[`${k}.${j}`] = sub[j];
+            }
+        } else {
+            res[k] = obj[k];
+        }
+    }
+    return res;
+  }
   private static validateKeyReleasePolicyClaims(
     keyReleasePolicyClaims: IKeyReleasePolicySnpProps,
     attestationClaims: IAttestationReport,
@@ -209,6 +223,8 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
         logContext,
       );
     }
+    // Flatten the attestationClaims
+    attestationClaims= KeyReleasePolicy.flattenObject(attestationClaims);
 
     // Check claims
     let policyValidationResult =
@@ -232,6 +248,10 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
           logContext
         );
     }
+    if (!policyValidationResult.success) {
+      return policyValidationResult;
+    }
+
     if (keyReleasePolicy.gt !== null && keyReleasePolicy.gt !== undefined) {
       Logger.debug(`Validating gt operator`, logContext, keyReleasePolicy.gt);
       policyValidationResult =

@@ -117,10 +117,10 @@ curl ${KMS_URL}/app/listpubkeys --cacert ${KEYS_DIR}/service_cert.pem  -H "Conte
 curl $KMS_URL/app/key -X POST --cacert ${KEYS_DIR}/service_cert.pem  -H "Content-Type: application/json" -H "Authorization:$AUTHORIZATION"  -w '\n'
 
 # Get key release policy
-curl $KMS_URL/app/keyReleasePolicy --cacert ${KEYS_DIR}/service_cert.pem --cert ${KEYS_DIR}/member0_cert.pem --key ${KEYS_DIR}/member0_privk.pem -H "Content-Type: application/json" | jq
+curl $KMS_URL/app/keyReleasePolicy --cacert ${KEYS_DIR}/service_cert.pem  -H "Authorization:$AUTHORIZATION" -H "Content-Type: application/json" | jq
 
 # Get settings policy
-curl $KMS_URL/app/settingsPolicy --cacert ${KEYS_DIR}/service_cert.pem --cert ${KEYS_DIR}/member0_cert.pem --key ${KEYS_DIR}/member0_privk.pem -H "Content-Type: application/json" | jq
+curl $KMS_URL/app/settingsPolicy --cacert ${KEYS_DIR}/service_cert.pem  -H "Authorization:$AUTHORIZATION" -H "Content-Type: application/json" | jq
 
 # Get receipt
 curl $KMS_URL/receipt?transaction_id=2.20 --cacert ${KEYS_DIR}/service_cert.pem --cert ${KEYS_DIR}/user0_cert.pem --key ${KEYS_DIR}/user0_privk.pem -H "Content-Type: application/json" -i  -w '\n'

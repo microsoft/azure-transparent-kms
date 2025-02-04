@@ -49,3 +49,21 @@ def settingsPolicy(**kwargs):
 
 def auth(**kwargs):
     return call_endpoint("auth", **kwargs)
+
+def setKeyReleaseClaims(type: str, claims: dict):
+    if not type or not claims:
+        raise ValueError("Both 'type' and 'claims' are required.")
+
+    claims_json = json.dumps(claims)  # Convert the claims dictionary to a JSON string
+    return call_endpoint("keyReleaseClaims", type=type, claims=claims_json)
+
+def setKeyRotationPolicy(key_rotation_policy: dict):
+    if not key_rotation_policy:
+        raise ValueError("'key_rotation_policy' is required.")
+
+    key_rotation_policy_json = json.dumps(key_rotation_policy)  # Convert the claims dictionary to a JSON string
+    return call_endpoint("keyRotationPolicy", key_rotation_policy=key_rotation_policy_json)
+
+
+def getKeyRotationPolicy():
+    return call_endpoint("getKeyRotationPolicy")

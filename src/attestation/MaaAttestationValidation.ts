@@ -5,8 +5,9 @@ import { IMaaAttestationReport } from "./IMaaAttestationReport";
 import { ServiceResult } from "../utils/ServiceResult";
 import { MaaAttestationClaims } from "./MaaAttestationClaims";
 import { Logger, LogContext } from "../utils/Logger";
-import { keyReleasePolicyMap } from "../repositories/Maps";
+import { keyReleaseMapName } from "../repositories/Maps";
 import { KeyReleasePolicy } from "../policies/KeyReleasePolicy";
+import { ccf } from "@microsoft/ccf-app/global";
 
 export class MaaAttestationValidation {
   private logContext: LogContext;
@@ -31,7 +32,7 @@ export class MaaAttestationValidation {
 
     // Get the key release policy
     const keyReleasePolicy =
-      KeyReleasePolicy.getKeyReleasePolicyFromMap(keyReleasePolicyMap, this.logContext);
+      KeyReleasePolicy.getKeyReleasePolicyFromMap(ccf.kv[keyReleaseMapName], this.logContext);
     Logger.debug(
       `Key release policy: ${JSON.stringify(
         keyReleasePolicy,

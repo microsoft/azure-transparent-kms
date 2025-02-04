@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import * as ccfapp from "@microsoft/ccf-app";
 import { enableEndpoint } from "../utils/Tooling";
 import { ServiceResult } from "../utils/ServiceResult";
@@ -6,7 +9,6 @@ import { KeyRotationPolicy } from "../policies/KeyRotationPolicy";
 import { keyRotationPolicySet } from "../repositories/Maps";
 import { LogContext } from "../utils/Logger";
 import { IKeyRotationPolicy } from "../policies/IKeyRotationPolicy";
-
 
 // Enable the endpoint
 enableEndpoint();
@@ -17,10 +19,10 @@ enableEndpoint();
  * @returns A ServiceResult indicating success or failure.
  */
 export const setKeyRotationPolicy = (
-    request: ccfapp.Request<{ key_rotation_policy: Record<string, any> }>,
+    request: ccfapp.Request<{ key_rotation_policy: IKeyRotationPolicy }>, // Updated to IKeyRotationPolicy
 ): ServiceResult<string> => {
     const logContext = new LogContext().appendScope("keyRotationPolicyEndpoint");
-    const serviceRequest = new ServiceRequest<{ key_rotation_policy: Record<string, any> }>(logContext, request);
+    const serviceRequest = new ServiceRequest<{ key_rotation_policy: IKeyRotationPolicy }>(logContext, request);
 
     // Check if caller has a valid identity
     const [_, isValidIdentity] = serviceRequest.isAuthenticated();
@@ -35,15 +37,12 @@ export const setKeyRotationPolicy = (
         );
     }
 
-    const { key_rotation_policy } = body;
-    // Assert the type of key_rotation_policy
-    const policy: IKeyRotationPolicy = key_rotation_policy as IKeyRotationPolicy;
-
+    const keyRotationPolicy: IKeyRotationPolicy = body.key_rotation_policy;
 
     try {
         // Validate and apply the policy
-        KeyRotationPolicy.validate(policy);
-        KeyRotationPolicy.apply(keyRotationPolicySet, policy);
+        KeyRotationPolicy.validate(keyRotationPolicy);
+        KeyRotationPolicy.apply(keyRotationPolicySet, keyRotationPolicy);
 
         return ServiceResult.Succeeded<string>("Key rotation policy set successfully.", logContext);
     } catch (error: any) {

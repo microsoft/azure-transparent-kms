@@ -12,7 +12,7 @@ import {
   SnpAttestationResult,
 } from "@microsoft/ccf-app/global";
 import { SnpAttestationClaims } from "./SnpAttestationClaims";
-import { keyReleaseMapName, keyReleasePolicyMap } from "../repositories/Maps";
+import { keyReleaseMapName } from "../repositories/Maps";
 import { Logger, LogContext } from "../utils/Logger";
 import { KeyReleasePolicy } from "../policies/KeyReleasePolicy";
 

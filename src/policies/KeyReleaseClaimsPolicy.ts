@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { IClaims } from "../repositories/KeyReleaseClaimsPolicyStore";
+import { IClaims } from "../policies/IKeyReleaseClaims";
 import { keyReleasePolicyMap } from "../repositories/Maps";
 
 export class KeyReleaseClaims {

@@ -1,27 +1,37 @@
 import * as ccfapp from "@microsoft/ccf-app";
 import { IClaims } from "../policies/IKeyReleaseClaims";
 
-
 // KeyReleaseClaimsPolicyStore class
-export class KeyReleaseClaimsPolicyStore<K extends string, T> {
-  private _store: ccfapp.TypedKvMap<K, T>;
+export class KeyReleaseClaimsPolicyStore {
+  private _store: ccfapp.TypedKvMap<string, IClaims>;
 
   constructor(public nameOfMap: string) {
-    this._store = ccfapp.typedKv(nameOfMap, ccfapp.string, ccfapp.json<T>());
+    this._store = ccfapp.typedKv(nameOfMap as string, ccfapp.string, ccfapp.json<IClaims>());
   }
 
-  public get store(): ccfapp.TypedKvMap<K, T> {
+  public get store(): ccfapp.TypedKvMap<string, IClaims> {
     return this._store;
   }
 
-  // Store key item with claims digest in the map
+  /**
+   * Stores a claim(s) into the key-value store.
+   * @param type The key type.
+   * @param claim The single claim object (one or more fields from IClaims).
+   */
   public storeClaims(type: string, claims: Partial<IClaims>): void {
-    let items: Partial<IClaims> = {};
+    const validKeys = new Set(Object.keys({} as IClaims));
+    const claimsKeys = Object.keys(claims);
 
-    if (this._store.has(type as K)) {
-      const itemsBuf = this._store.get(type as K);
-      if (itemsBuf) {
-        items = itemsBuf as Partial<IClaims>;
+    if (claimsKeys.length === 0 || !claimsKeys.every((key) => validKeys.has(key))) {
+      throw new Error(`Invalid claims provided. Allowed claims: ${Array.from(validKeys).join(", ")}`);
+    }
+
+    let existingClaims: Partial<IClaims> = {};
+
+    if (this._store.has(type)) {
+      const storedClaims = this._store.get(type);
+      if (storedClaims) {
+        existingClaims = storedClaims;
       } else {
         throw new Error(`Unexpected undefined value for key: ${type}`);
       }
@@ -29,38 +39,40 @@ export class KeyReleaseClaimsPolicyStore<K extends string, T> {
       console.log(`KRP add ${type} => key: ${type} is new in the key release policy`);
     }
 
-    Object.keys(claims).forEach((key) => {
-      if (!(key in {} as IClaims)) {
-        throw new Error(`KRP add ${type} => The claim ${key} is not an allowed claim.`);
-      }
+    // Store each claim correctly
+    claimsKeys.forEach((key) => {
+      const value = claims[key as keyof IClaims];
 
-      let item = claims[key as keyof IClaims];
-      if (!Array.isArray(item)) {
-        item = [item] as any;
-      }
-
-      if (items[key as keyof IClaims] !== undefined) {
-        (item as any[]).forEach((i) => {
-          console.log(`KRP add ${type} => Adding ${i} to ${key}`);
-          (items[key as keyof IClaims] as any[]).push(i);
-        });
-      } else {
-        items[key as keyof IClaims] = item as any;
+      if (value !== undefined) {
+        // Explicit type assertion ensures no `undefined` issue
+        (existingClaims as Record<string, string | number | boolean>)[key] = value;
       }
     });
 
-    this._store.set(type as K, JSON.stringify(items) as T);
-    console.log(`KRP add ${type} => Updated claims stored successfully.`);
+    // Save updated claims back to the store
+    this._store.set(type, existingClaims as IClaims);
+    console.log(`KRP add ${type} => Updated claim(s) stored successfully.`);
   }
 
-  // Remove key item with claims digest from the map
+  /**
+   * Removes claims from the key-value store.
+   * @param type The key type.
+   * @param claims The claims to remove.
+   */
   public removeClaims(type: string, claims: Partial<IClaims>): void {
-    let items: Partial<IClaims> = {};
+    const validKeys = new Set(Object.keys({} as IClaims));
+    const claimKeys = Object.keys(claims);
 
-    if (this._store.has(type as K)) {
-      const itemsBuf = this._store.get(type as K);
-      if (itemsBuf) {
-        items = itemsBuf as Partial<IClaims>;
+    if (claimKeys.length === 0 || !claimKeys.every((key) => validKeys.has(key))) {
+      throw new Error(`Invalid claims provided. Allowed claims: ${Array.from(validKeys).join(", ")}`);
+    }
+
+    let existingClaims: Partial<IClaims> = {};
+
+    if (this._store.has(type)) {
+      const storedClaims = this._store.get(type);
+      if (storedClaims) {
+        existingClaims = storedClaims;
       } else {
         throw new Error(`Unexpected undefined value for key: ${type}`);
       }
@@ -69,33 +81,29 @@ export class KeyReleaseClaimsPolicyStore<K extends string, T> {
       throw new Error(`The key ${type} does not exist in the key release policy.`);
     }
 
-    Object.keys(claims).forEach((key) => {
-      if (!(key in {} as IClaims)) {
-        throw new Error(`KRP remove ${type} => The claim ${key} is not an allowed claim.`);
-      }
-
-      let item = claims[key as keyof IClaims];
-      if (!Array.isArray(item)) {
-        item = [item] as any;
-      }
-
-      if (items[key as keyof IClaims] !== undefined) {
-        (item as any[]).forEach((i) => {
-          console.log(`KRP remove ${type} => Removing ${i} from ${key}`);
-          items[key as keyof IClaims] = (items[key as keyof IClaims] as any[]).filter(
-            (value: any) => value !== i
-          ) as any;
-          if ((items[key as keyof IClaims] as any[]).length === 0) {
-            delete items[key as keyof IClaims];
-          }
-        });
-      } else {
-        console.log(`KRP remove ${type} => Claim ${key} not found in the key release policy`);
-        throw new Error(`The claim ${key} does not exist in the key release policy.`);
+    // Remove only if the claim exists
+    claimKeys.forEach((key) => {
+      if (existingClaims[key as keyof IClaims] !== undefined) {
+        delete existingClaims[key as keyof IClaims];
       }
     });
 
-    this._store.set(type as K, JSON.stringify(items) as T);
+    this._store.set(type, existingClaims as IClaims);
     console.log(`KRP remove ${type} => Updated claims after removal stored successfully.`);
+  }
+
+  /**
+   * Fetches claims from the store.
+   * @param type The key type to fetch.
+   * @returns The claims object or null if not found.
+   */
+  public getClaims(type: string): IClaims | null {
+    if (this._store.has(type)) {
+      const storedData = this._store.get(type);
+      if (storedData) {
+        return storedData as IClaims;
+      }
+    }
+    return null;
   }
 }

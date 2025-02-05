@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 // Define an interface for the allowed claims
-export interface IClaims {
+export interface IKeyReleaseClaims {
   "x-ms-attestation-type"?: string;
   "x-ms-compliance-status"?: string;
   "x-ms-policy-hash"?: string;

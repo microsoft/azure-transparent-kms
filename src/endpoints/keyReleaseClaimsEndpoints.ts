@@ -8,7 +8,7 @@ import { ServiceRequest } from "../utils/ServiceRequest";
 import { KeyReleaseClaims } from "../policies/KeyReleaseClaimsPolicy";
 import { keyReleasePolicyMap } from "../repositories/Maps";
 import { LogContext } from "../utils/Logger";
-import { IClaims } from "../policies/IKeyReleaseClaims";
+import { IKeyReleaseClaims } from "../policies/IKeyReleaseClaims";
 
 // Enable the endpoint
 enableEndpoint();
@@ -19,11 +19,11 @@ enableEndpoint();
  * @returns A ServiceResult with the operation status.
  */
 export const setKeyReleaseClaims = (
-  request: ccfapp.Request<{ type: string; claims: Partial<IClaims> }>, // Updated claims type
+  request: ccfapp.Request<{ type: string; claims: Partial<IKeyReleaseClaims> }>, // Updated claims type
 ): ServiceResult<string> => {
 
   const logContext = new LogContext().appendScope("keyReleasePolicyClaimsEndpoint");
-  const serviceRequest = new ServiceRequest<{ type: string; claims: Partial<IClaims> }>(logContext, request);
+  const serviceRequest = new ServiceRequest<{ type: string; claims: Partial<IKeyReleaseClaims> }>(logContext, request);
 
   // Check if caller has a valid identity
   const [_, isValidIdentity] = serviceRequest.isAuthenticated();
@@ -41,7 +41,7 @@ export const setKeyReleaseClaims = (
   const { type, claims } = body;
 
   // Validate claims: Ensure all keys exist in IClaims
-  const validKeys = new Set(Object.keys({} as IClaims));
+  const validKeys = new Set(Object.keys({} as IKeyReleaseClaims));
   const invalidKeys = Object.keys(claims).filter(key => !validKeys.has(key));
 
   if (invalidKeys.length > 0) {

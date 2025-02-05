@@ -8,7 +8,7 @@ import { ServiceRequest } from "../utils/ServiceRequest";
 import { LogContext } from "../utils/Logger";
 import { IJwtValidationPolicy } from "../policies/IJwtValidationPolicy";
 import { jwtValidationPolicyMap } from "../repositories/Maps";
-import { JwtValidationPolicy } from "../policies/JwtValidationPolicy";
+import { addJwtValidationPolicyFromStore, removeJwtValidationPolicyFromStore } from "../policies/JwtValidationPolicy";
 
 // Enable the endpoint
 enableEndpoint();
@@ -41,7 +41,7 @@ export const setJwtValidationPolicy = (
 
     try {
         // Validate and apply the policy
-        JwtValidationPolicy.add(jwtValidationPolicyMap, jwtValidationPolicy);
+        addJwtValidationPolicyFromStore(jwtValidationPolicyMap, jwtValidationPolicy);
 
         return ServiceResult.Succeeded<string>("Key rotation policy set successfully.", logContext);
     } catch (error: any) {
@@ -76,8 +76,8 @@ export const removeJwtValidationPolicy = (
     const issuer: string = body.issuer;
 
     try {
-        // Validate and apply the policy
-        JwtValidationPolicy.remove(jwtValidationPolicyMap, issuer);
+        // Remove Policy on Issuer
+        removeJwtValidationPolicyFromStore(jwtValidationPolicyMap, issuer);
 
         return ServiceResult.Succeeded<string>(`Removed JWT Validation Policy for issuer: ${issuer}.`, logContext);
     } catch (error: any) {

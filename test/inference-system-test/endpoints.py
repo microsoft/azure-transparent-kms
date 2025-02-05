@@ -64,7 +64,6 @@ def setKeyRotationPolicy(key_rotation_policy: dict):
     key_rotation_policy_json = json.dumps(key_rotation_policy)  # Convert the claims dictionary to a JSON string
     return call_endpoint("key_rotation_policy", "set", policy=key_rotation_policy_json)
 
-
 def getKeyRotationPolicy():
     return call_endpoint("key_rotation_policy", "get")
 
@@ -74,7 +73,6 @@ def setJwtValidationPolicy(jwt_validation_policy: dict):
 
     jwt_validation_policy_json = json.dumps(jwt_validation_policy)  # Convert the claims dictionary to a JSON string
     return call_endpoint("jwt_validation_policy", "set", policy=jwt_validation_policy)
-
 
 def removeJwtValidationPolicy(issuer: str):
     return call_endpoint("jwt_validation_policy", "remove", issuer=issuer)

@@ -2,9 +2,9 @@ import pytest
 from endpoints import setJwtValidationPolicy, removeJwtValidationPolicy
 
 
-def test_set_keyRotationPolicy(setup_kms):
+def test_set_jwtValidationPolicy(setup_kms):
     # Add claims
-    status_code, key_release_json = setJwtValidationPolicy(
+    status_code, _ = setJwtValidationPolicy(
         policy={
             "issuer": "https://sts.windows.net/72f988bf-86f1-41af-91ab-2d7cd011db47/",
             "validation_policy": {

@@ -27,7 +27,7 @@ export class KeyReleaseClaimsPolicyStore {
     }
 
     let existingClaims: Partial<IKeyReleaseClaims> = {};
-
+    
     // Store each claim correctly
     claimsKeys.forEach((key) => {
       const value = claims[key as keyof IKeyReleaseClaims];
@@ -36,11 +36,11 @@ export class KeyReleaseClaimsPolicyStore {
         // Explicit type assertion ensures no `undefined` issue
         (existingClaims as Record<string, string | number | boolean>)[key] = value;
       }
+      
+      // Save updated claims back to the store
+      this._store.set(key, existingClaims as IKeyReleaseClaims);
     });
-
-    // Save updated claims back to the store
-    this._store.set(type, existingClaims as IKeyReleaseClaims);
-    console.log(`KRP add ${type} => Updated claim(s) stored successfully.`);
+    console.log(`KRP Updated claim(s) stored successfully.`);
   }
 
   /**

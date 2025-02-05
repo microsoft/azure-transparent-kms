@@ -28,17 +28,6 @@ export class KeyReleaseClaimsPolicyStore {
 
     let existingClaims: Partial<IKeyReleaseClaims> = {};
 
-    if (this._store.has(type)) {
-      const storedClaims = this._store.get(type);
-      if (storedClaims) {
-        existingClaims = storedClaims;
-      } else {
-        throw new Error(`Unexpected undefined value for key: ${type}`);
-      }
-    } else {
-      console.log(`KRP add ${type} => key: ${type} is new in the key release policy`);
-    }
-
     // Store each claim correctly
     claimsKeys.forEach((key) => {
       const value = claims[key as keyof IKeyReleaseClaims];

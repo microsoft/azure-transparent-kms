@@ -55,15 +55,15 @@ def setKeyReleaseClaims(type: str, claims: dict):
         raise ValueError("Both 'type' and 'claims' are required.")
 
     claims_json = json.dumps(claims)  # Convert the claims dictionary to a JSON string
-    return call_endpoint("keyReleaseClaims", type=type, claims=claims_json)
+    return call_endpoint("key_release_policy_claims", type=type, claims=claims_json)
 
 def setKeyRotationPolicy(key_rotation_policy: dict):
     if not key_rotation_policy:
         raise ValueError("'key_rotation_policy' is required.")
 
     key_rotation_policy_json = json.dumps(key_rotation_policy)  # Convert the claims dictionary to a JSON string
-    return call_endpoint("keyRotationPolicy", key_rotation_policy=key_rotation_policy_json)
+    return call_endpoint("key_rotation_policy", "set", policy=key_rotation_policy_json)
 
 
 def getKeyRotationPolicy():
-    return call_endpoint("getKeyRotationPolicy")
+    return call_endpoint("key_rotation_policy", "get")

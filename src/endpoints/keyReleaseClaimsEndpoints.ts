@@ -40,7 +40,7 @@ export const setKeyReleaseClaims = (
 
   const { type, claims } = body;
 
-  // Validate claims: Ensure all keys exist in IClaims
+  // Validate claims: Ensure all keys exist in IKeyReleaseClaims
   const validKeys = new Set(Object.keys({} as IKeyReleaseClaims));
   const invalidKeys = Object.keys(claims).filter(key => !validKeys.has(key));
 

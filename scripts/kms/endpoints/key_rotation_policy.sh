@@ -26,32 +26,29 @@ validate_env_vars() {
 }
 
 # Function to handle setting key rotation policy via the CCF API
-keyRotationPolicy() {
+setKeyRotationPolicy() {
     local policy=""
 
     # Parse arguments for the 'set' operation
-    while [[ "$#" -gt 0 ]]; do
-        case $1 in
-            --keyRotationPolicy)
-                policy="$2"
-                shift ;;
-            *)
-                echo "Unknown parameter: $1"
-                usage ;;
-        esac
-        shift
-    done
-
-    # Validate that 'policy' is provided
-    if [[ -z "$policy" ]]; then
-        echo "Error: Missing key rotation policy."
+    if [[ "$1" == "--policy" && -n "$2" ]]; then
+        policy="$2"
+    else
+        echo "Error: Missing or invalid key rotation policy."
         usage
     fi
 
-    # Check for jq installation
+    # Check for jq installation and install if missing
     if ! command -v jq > /dev/null 2>&1; then
-        echo "Error: 'jq' is not installed. Please install 'jq' to validate JSON input."
-        exit 1
+        echo "'jq' is not installed. Attempting to install it now..."
+        
+        sudo apt-get update && sudo apt-get install -y jq
+
+        # Verify if jq was successfully installed
+        if ! command -v jq > /dev/null 2>&1; then
+            echo "Error: 'jq' installation failed. Please install it manually."
+            exit 1
+        fi
+        echo "'jq' installed successfully."
     fi
 
     # Validate JSON format
@@ -61,7 +58,7 @@ keyRotationPolicy() {
     fi
 
     # Send a curl request to the CCF API endpoint
-    response=$(curl $KMS_URL/app/setKeyRotationPolicy \
+    response=$(curl "$KMS_URL/app/setKeyRotationPolicy" \
         --cacert "$KMS_SERVICE_CERT_PATH" \
         --cert "$KMS_MEMBER_CERT_PATH" \
         --key "$KMS_MEMBER_PRIVK_PATH" \
@@ -69,8 +66,13 @@ keyRotationPolicy() {
         -d "{\"key_rotation_policy\": $policy}" \
         -w '\n%{http_code}\n')
 
-    # Extract status code from the response
-    status_code=$(echo "$response" | tail -n1)
+    # Extract status code from the response safely
+    status_code=$(echo "$response" | tail -n1 | grep -oE '[0-9]+')
+
+    if [[ -z "$status_code" ]]; then
+        echo "Error: No valid response received from the server."
+        exit 1
+    fi
 
     if [[ "$status_code" -ne 200 ]]; then
         echo "Error: Failed to set key rotation policy. Status code: $status_code"
@@ -83,15 +85,20 @@ keyRotationPolicy() {
 # Function to handle getting key rotation policy via the CCF API
 getKeyRotationPolicy() {
     # Send a curl request to the CCF API endpoint
-    response=$(curl $KMS_URL/app/getKeyRotationPolicy \
+    response=$(curl "$KMS_URL/app/getKeyRotationPolicy" \
         --cacert "$KMS_SERVICE_CERT_PATH" \
         --cert "$KMS_MEMBER_CERT_PATH" \
         --key "$KMS_MEMBER_PRIVK_PATH" \
         -H "Content-Type: application/json" \
         -w '\n%{http_code}\n')
 
-    # Extract status code from the response
-    status_code=$(echo "$response" | tail -n1)
+    # Extract status code from the response safely
+    status_code=$(echo "$response" | tail -n1 | grep -oE '[0-9]+')
+
+    if [[ -z "$status_code" ]]; then
+        echo "Error: No valid response received from the server."
+        exit 1
+    fi
 
     if [[ "$status_code" -ne 200 ]]; then
         echo "Error: Failed to retrieve key rotation policy. Status code: $status_code"
@@ -107,14 +114,21 @@ getKeyRotationPolicy() {
 main() {
     validate_env_vars
 
-    if [[ "$1" == "set" ]]; then
-        shift
-        keyRotationPolicy "$@"
-    elif [[ "$1" == "get" ]]; then
-        getKeyRotationPolicy
-    else
-        usage
-    fi
+    # Store operation in a variable
+    operation="$1"
+    shift
+
+    case "$operation" in
+        "set")
+            setKeyRotationPolicy "$@"
+            ;;
+        "get")
+            getKeyRotationPolicy
+            ;;
+        *)
+            usage
+            ;;
+    esac
 }
 
 # Execute main function with arguments

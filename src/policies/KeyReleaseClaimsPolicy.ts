@@ -1,26 +1,22 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { IKeyReleaseClaims } from "../policies/IKeyReleaseClaims";
-import { keyReleasePolicyMap } from "../repositories/Maps";
+import { KeyReleaseClaimsPolicyStore } from "../repositories/KeyReleaseClaimsPolicyStore";
+import { IKeyReleasePolicyClaims } from "./IKeyReleasePolicyClaims";
 
-export class KeyReleaseClaims {
+export const add = (
+  map: KeyReleaseClaimsPolicyStore,
+  claims: IKeyReleasePolicyClaims
+): void => {
+  console.log(`Add claims from key release policy: ${JSON.stringify(claims)}`);
+  map.storeClaims(claims);
+};
 
-    static add(
-        map: typeof keyReleasePolicyMap,
-        type: string,
-        claims: IKeyReleaseClaims,
-    ): void {
-        console.log(`Add claims from key release policy for ${type}: ${JSON.stringify(claims)}`);
-        keyReleasePolicyMap.storeClaims(type, claims);
-    }
 
-    static remove(
-        map: typeof keyReleasePolicyMap,
-        type: string,
-        claims: IKeyReleaseClaims,
-    ): void {
-        console.log(`Remove claims from key release policy for ${type}: ${JSON.stringify(claims)}`);
-        keyReleasePolicyMap.removeClaims(type, claims);
-    }
-}
+export const remove = (
+  map: KeyReleaseClaimsPolicyStore,
+  claims: IKeyReleasePolicyClaims
+): void => {
+  console.log(`Remove claims from key release policy : ${JSON.stringify(claims)}`);
+  map.removeClaims(claims);
+};

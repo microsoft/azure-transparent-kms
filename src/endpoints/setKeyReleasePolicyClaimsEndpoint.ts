@@ -5,10 +5,10 @@ import * as ccfapp from "@microsoft/ccf-app";
 import { enableEndpoint } from "../utils/Tooling";
 import { ServiceResult } from "../utils/ServiceResult";
 import { ServiceRequest } from "../utils/ServiceRequest";
-import { KeyReleaseClaims } from "../policies/KeyReleaseClaimsPolicy";
 import { keyReleasePolicyMap } from "../repositories/Maps";
 import { LogContext } from "../utils/Logger";
-import { IKeyReleaseClaims } from "../policies/IKeyReleaseClaims";
+import { IKeyReleasePolicyClaims } from "../policies/IKeyReleasePolicyClaims";
+import { add as addKeyReleasPolicyClaims, remove as removeKeyReleasePolicyClaims } from "../policies/KeyReleaseClaimsPolicy";
 
 // Enable the endpoint
 enableEndpoint();
@@ -18,12 +18,12 @@ enableEndpoint();
  * @param request A CCF request containing the operation type and claims.
  * @returns A ServiceResult with the operation status.
  */
-export const setKeyReleaseClaims = (
-  request: ccfapp.Request<{ type: string; claims: Partial<IKeyReleaseClaims> }>, // Updated claims type
+export const setKeyReleasePolicyClaims = (
+  request: ccfapp.Request<{ type: string; claims: Partial<IKeyReleasePolicyClaims> }>, // Updated claims type
 ): ServiceResult<string> => {
 
-  const logContext = new LogContext().appendScope("keyReleasePolicyClaimsEndpoint");
-  const serviceRequest = new ServiceRequest<{ type: string; claims: Partial<IKeyReleaseClaims> }>(logContext, request);
+  const logContext = new LogContext().appendScope("setKeyReleasePolicyClaimsEndpoint");
+  const serviceRequest = new ServiceRequest<{ type: string; claims: Partial<IKeyReleasePolicyClaims> }>(logContext, request);
 
   // Check if caller has a valid identity
   const [_, isValidIdentity] = serviceRequest.isAuthenticated();
@@ -41,7 +41,7 @@ export const setKeyReleaseClaims = (
   const { type, claims } = body;
 
   // Validate claims: Ensure all keys exist in IKeyReleaseClaims
-  const validKeys = new Set(Object.keys({} as IKeyReleaseClaims));
+  const validKeys = new Set(Object.keys({} as IKeyReleasePolicyClaims));
   const invalidKeys = Object.keys(claims).filter(key => !validKeys.has(key));
 
   if (invalidKeys.length > 0) {
@@ -54,9 +54,9 @@ export const setKeyReleaseClaims = (
 
   try {
     if (type === "add") {
-      KeyReleaseClaims.add(keyReleasePolicyMap, "claims", claims);
+      addKeyReleasPolicyClaims(keyReleasePolicyMap, claims);
     } else if (type === "remove") {
-      KeyReleaseClaims.remove(keyReleasePolicyMap, "claims", claims);
+      removeKeyReleasePolicyClaims(keyReleasePolicyMap, claims);
     } else {
       return ServiceResult.Failed<string>({ errorMessage: `Unsupported operation: ${type}` }, 400, logContext);
     }

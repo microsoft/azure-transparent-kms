@@ -5,10 +5,10 @@ import * as ccfapp from "@microsoft/ccf-app";
 import { enableEndpoint } from "../utils/Tooling";
 import { ServiceResult } from "../utils/ServiceResult";
 import { ServiceRequest } from "../utils/ServiceRequest";
-import { KeyRotationPolicy } from "../policies/KeyRotationPolicy";
 import { keyRotationPolicySet } from "../repositories/Maps";
 import { LogContext } from "../utils/Logger";
 import { IKeyRotationPolicy } from "../policies/IKeyRotationPolicy";
+import { applyKeyRotationPolicy, getKeyRotationPolicyFromMap as getKeyRotationPolicyFromSet, validateKeyRotationPolicy } from "../policies/KeyRotationPolicy";
 
 // Enable the endpoint
 enableEndpoint();
@@ -21,7 +21,7 @@ enableEndpoint();
 export const setKeyRotationPolicy = (
     request: ccfapp.Request<{ key_rotation_policy: IKeyRotationPolicy }>, // Updated to IKeyRotationPolicy
 ): ServiceResult<string> => {
-    const logContext = new LogContext().appendScope("keyRotationPolicyEndpoint");
+    const logContext = new LogContext().appendScope("setKeyRotationPolicyEndpoint");
     const serviceRequest = new ServiceRequest<{ key_rotation_policy: IKeyRotationPolicy }>(logContext, request);
 
     // Check if caller has a valid identity
@@ -41,8 +41,8 @@ export const setKeyRotationPolicy = (
 
     try {
         // Validate and apply the policy
-        KeyRotationPolicy.validate(keyRotationPolicy);
-        KeyRotationPolicy.apply(keyRotationPolicySet, keyRotationPolicy);
+        validateKeyRotationPolicy(keyRotationPolicy);
+        applyKeyRotationPolicy(keyRotationPolicySet, keyRotationPolicy);
 
         return ServiceResult.Succeeded<string>("Key rotation policy set successfully.", logContext);
     } catch (error: any) {
@@ -65,7 +65,7 @@ export const getKeyRotationPolicy = (
     if (isValidIdentity.failure) return isValidIdentity;
 
     try {
-        const policy = KeyRotationPolicy.get(keyRotationPolicySet);
+        const policy = getKeyRotationPolicyFromSet(keyRotationPolicySet);
 
         if (!policy) {
             return ServiceResult.Failed<string>({ errorMessage: "Key rotation policy not found." }, 400, logContext);

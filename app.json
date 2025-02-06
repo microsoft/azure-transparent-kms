@@ -228,6 +228,54 @@
           }
         }
       }
-    }
+    },
+    "/setKeyReleasePolicyClaims": {
+      "post": {
+        "js_module": "endpoints/setKeyReleasePolicyClaimsEndpoint.js",
+        "js_function": "setKeyReleasePolicyClaims",
+        "forwarding_required": "always",
+        "authn_policies": ["user_cert", "jwt"],
+        "mode": "readwrite",
+        "openapi": {
+          "responses": {
+            "200": {
+              "description": "Update key release policy claims"
+            }
+          }
+        }
+      }
+    },
+    "/setjwtValidationPolicyEndpoint": {
+      "post": {
+        "js_module": "endpoints/jwtValidationPolicyEndpoint.js",
+        "js_function": "setJwtValidationPolicy",
+        "forwarding_required": "always",
+        "authn_policies": ["user_cert", "jwt"],
+        "mode": "readwrite",
+        "openapi": {
+          "responses": {
+            "200": {
+              "description": "Set JWT Validation Policy"
+            }
+          }
+        }
+      }
+    },
+    "/removeJwtValidationPolicyFromStoreEndpoint": {
+      "post": {
+        "js_module": "endpoints/jwtValidationPolicyEndpoint.js",
+        "js_function": "removeJwtValidationPolicy",
+        "forwarding_required": "always",
+        "authn_policies": ["user_cert", "jwt"],
+        "mode": "readwrite",
+        "openapi": {
+          "responses": {
+            "200": {
+              "description": "Remove JWT Validation Policy"
+            }
+          }
+        }
+      }
+    }        
   }
 }

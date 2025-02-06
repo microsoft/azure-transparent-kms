@@ -58,8 +58,7 @@ setJwtValidationPolicy() {
     # Send a curl request to the CCF API endpoint
     response=$(curl -s "$KMS_URL/app/setJwtValidationPolicy" \
         --cacert "$KMS_SERVICE_CERT_PATH" \
-        --cert "$KMS_MEMBER_CERT_PATH" \
-        --key "$KMS_MEMBER_PRIVK_PATH" \
+ auth_arg=(--cert $KMS_USER_CERT_PATH --key $KMS_USER_PRIVK_PATH)
         -H "Content-Type: application/json" \
         -d "{\"jwt_validation_policy\": $policy}" \
         -w '\n%{http_code}\n')
@@ -77,7 +76,7 @@ setJwtValidationPolicy() {
         exit 1
     fi
 
-    echo "✅ JWT Validation policy set successfully."
+    echo "JWT Validation policy set successfully."
 }
 
 # Function to remove JWT Validation policy via the CCF API
@@ -97,14 +96,14 @@ removeJwtValidationPolicy() {
         echo "Error: Issuer cannot be empty."
         exit 1
     fi
-    
+
     # Send a curl request to the CCF API endpoint
     response=$(curl -s "$KMS_URL/app/removeJwtValidationPolicy" \
         --cacert "$KMS_SERVICE_CERT_PATH" \
         --cert "$KMS_MEMBER_CERT_PATH" \
         --key "$KMS_MEMBER_PRIVK_PATH" \
         -H "Content-Type: application/json" \
-        -d "{\"jwt_validation_policy\": $issuer}" \
+        -d "{\"issuer\": $issuer}" \
         -w '\n%{http_code}\n')
 
     # Extract status code from the response safely

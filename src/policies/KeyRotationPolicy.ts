@@ -30,7 +30,7 @@ export const applyKeyRotationPolicy = (
 ): void => {
   console.log(`Applying key rotation policy: ${JSON.stringify(policy)}`);
 
-  map.storeRotationPolicy(policy);
+  map.storeRotationPolicy("test", policy);
   console.log(`Key rotation policy saved.`);
 };
 
@@ -39,5 +39,5 @@ export const getKeyRotationPolicyFromMap = (
   map: typeof keyRotationPolicySet
 ): IKeyRotationPolicy | undefined => {
   console.log(`Get key rotation policy`);
-  return map.getRotationPolicy();
+  return map.getRotationPolicy("test");
 };

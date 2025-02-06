@@ -4,9 +4,9 @@ from endpoints import setJwtValidationPolicy, removeJwtValidationPolicy
 
 def test_set_jwtValidationPolicy(setup_kms):
     # Add claims
-    status_code, _ = setJwtValidationPolicy(
-        policy={
-            "issuer": "https://sts.windows.net/72f988bf-86f1-41af-91ab-2d7cd011db47/",
+    status_code, response = setJwtValidationPolicy(
+        jwt_validation_policy={
+            "issuer": "test-issuer",
             "validation_policy": {
                 "iss": "https://sts.windows.net/72f988bf-86f1-41af-91ab-2d7cd011db47/",
                 "aud": "https://management.azure.com/",
@@ -23,14 +23,14 @@ def test_set_jwtValidationPolicy(setup_kms):
         }
     )
     assert status_code == 200
+    status_code, response = removeJwtValidationPolicy(issuer="test-issuer")
+    assert status_code == 200
 
 
 def test_removeJwtValidationPolicy(setup_kms):
-    # Add claims
-    status_code, key_rotation_policy = removeJwtValidationPolicy(issuer="test-issuer")
+    # Remove Test issue
+    status_code, response = removeJwtValidationPolicy(issuer="test-issuer")
     assert status_code == 200
-    assert key_rotation_policy["rotation_interval_seconds"] == 30
-    assert key_rotation_policy["grace_period_seconds"] == 5
 
 
 if __name__ == "__main__":

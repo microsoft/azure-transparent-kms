@@ -34,8 +34,8 @@ keyReleasePolicyClaims() {
     # Send a curl request to the CCF API endpoint to set the key release claims
     curl $KMS_URL/app/setkeyReleasePolicyClaims \
         --cacert $KMS_SERVICE_CERT_PATH \ # Provide the service certificate for TLS
-        --cert $KMS_MEMBER_CERT_PATH \    # Provide the member's client certificate
-        --key $KMS_MEMBER_PRIVK_PATH \    # Provide the member's private key
+        --cert $KMS_USER_CERT_PATH \    # Provide user's client certificate
+        --key $KMS_USER_PRIVK_PATH \    # Provide user's private key
         -H "Content-Type: application/json" \ # Specify the content type as JSON
         -d "{\"type\": \"$type\", \"claims\": $claims}" \ # Send the type and claims as JSON payload
         -w '\n%{http_code}\n'             # Output the HTTP status code at the end of the response

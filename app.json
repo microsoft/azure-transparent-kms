@@ -5,7 +5,10 @@
         "js_module": "endpoints/keyReleasePolicyEndpoint.js",
         "js_function": "keyReleasePolicy",
         "forwarding_required": "sometimes",
-        "authn_policies": ["member_cert", "jwt"],
+        "authn_policies": [
+          "member_cert",
+          "jwt"
+        ],
         "redirection_strategy": "none",
         "mode": "readonly",
         "openapi": {
@@ -27,7 +30,10 @@
         "js_module": "endpoints/settingsPolicyEndpoint.js",
         "js_function": "settingsPolicy",
         "forwarding_required": "sometimes",
-        "authn_policies": ["member_cert", "jwt"],
+        "authn_policies": [
+          "member_cert",
+          "jwt"
+        ],
         "mode": "readonly",
         "openapi": {
           "responses": {
@@ -201,7 +207,11 @@
         "js_module": "endpoints/kms.js",
         "js_function": "auth",
         "forwarding_required": "never",
-        "authn_policies": ["user_cert", "member_cert", "jwt"],
+        "authn_policies": [
+          "user_cert",
+          "member_cert",
+          "jwt"
+        ],
         "mode": "readonly",
         "openapi": {
           "responses": {
@@ -234,9 +244,41 @@
         "js_module": "endpoints/setKeyReleasePolicyClaimsEndpoint.js",
         "js_function": "setKeyReleasePolicyClaims",
         "forwarding_required": "always",
-        "authn_policies": ["user_cert", "jwt"],
+        "authn_policies": [
+          "user_cert",
+          "jwt"
+        ],
         "mode": "readwrite",
         "openapi": {
+          "requestBody": {
+            "description": "Payload to update key release policy claims",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "description": "The key type identifier for the policy."
+                    },
+                    "claims": {
+                      "type": "object",
+                      "description": "Key-value pairs of claims to be stored or removed.",
+                      "additionalProperties": {
+                        "type": "string",
+                        "description": "Claim values (can be a string, number, or boolean)."
+                      }
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "claims"
+                  ]
+                }
+              }
+            }
+          },
           "responses": {
             "200": {
               "description": "Update key release policy claims"
@@ -245,12 +287,15 @@
         }
       }
     },
-    "/setjwtValidationPolicyEndpoint": {
+    "/setJwtValidationPolicy": {
       "post": {
         "js_module": "endpoints/jwtValidationPolicyEndpoint.js",
         "js_function": "setJwtValidationPolicy",
         "forwarding_required": "always",
-        "authn_policies": ["user_cert", "jwt"],
+        "authn_policies": [
+          "user_cert",
+          "jwt"
+        ],
         "mode": "readwrite",
         "openapi": {
           "responses": {
@@ -261,12 +306,15 @@
         }
       }
     },
-    "/removeJwtValidationPolicyFromStoreEndpoint": {
+    "/removeJwtValidationPolicy": {
       "post": {
         "js_module": "endpoints/jwtValidationPolicyEndpoint.js",
         "js_function": "removeJwtValidationPolicy",
         "forwarding_required": "always",
-        "authn_policies": ["user_cert", "jwt"],
+        "authn_policies": [
+          "user_cert",
+          "jwt"
+        ],
         "mode": "readwrite",
         "openapi": {
           "responses": {
@@ -276,6 +324,44 @@
           }
         }
       }
-    }        
+    },
+    "/setKeyRotationPolicy": {
+      "post": {
+        "js_module": "endpoints/keyRotationPolicyEndpoints.js",
+        "js_function": "setKeyRotationPolicy",
+        "forwarding_required": "always",
+        "authn_policies": [
+          "user_cert",
+          "jwt"
+        ],
+        "mode": "readwrite",
+        "openapi": {
+          "responses": {
+            "200": {
+              "description": "Remove JWT Validation Policy"
+            }
+          }
+        }
+      }
+    },
+    "/getKeyRotationPolicy": {
+      "get": {
+        "js_module": "endpoints/keyRotationPolicyEndpoints.js",
+        "js_function": "getKeyRotationPolicy",
+        "forwarding_required": "always",
+        "authn_policies": [
+          "user_cert",
+          "jwt"
+        ],
+        "mode": "readonly",
+        "openapi": {
+          "responses": {
+            "200": {
+              "description": "Remove JWT Validation Policy"
+            }
+          }
+        }
+      }
+    }
   }
 }

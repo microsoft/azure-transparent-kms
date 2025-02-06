@@ -58,25 +58,26 @@ setJwtValidationPolicy() {
     # Send a curl request to the CCF API endpoint
     response=$(curl -s "$KMS_URL/app/setJwtValidationPolicy" \
         --cacert "$KMS_SERVICE_CERT_PATH" \
- auth_arg=(--cert $KMS_USER_CERT_PATH --key $KMS_USER_PRIVK_PATH)
+        --cert "$KMS_USER_CERT_PATH" \
+        --key "$KMS_USER_PRIVK_PATH" \
         -H "Content-Type: application/json" \
         -d "{\"jwt_validation_policy\": $policy}" \
         -w '\n%{http_code}\n')
 
-    # Extract status code from the response safely
-    status_code=$(echo "$response" | tail -n1 | grep -oE '[0-9]+')
+    # Extract status code (last line)
+    status_code=$(echo "$response" | tail -n1)
 
-    if [[ -z "$status_code" ]]; then
-        echo "Error: No valid response received from the server."
-        exit 1
+    # Extract JSON response (all lines except last)
+    json_response=$(echo "$response" | sed '$d')
+
+    # Ensure json_response is a valid JSON object, if empty default to {}
+    if [[ -z "$json_response" ]]; then
+        json_response="{}"
     fi
 
-    if [[ "$status_code" -ne 200 ]]; then
-        echo "Error: Failed to set JWT validation policy. Status code: $status_code"
-        exit 1
-    fi
-
-    echo "JWT Validation policy set successfully."
+    # Return a proper JSON response
+    echo "{\"status_code\": \"$status_code\", \"message\": \"$json_response\"}"
+    echo $status_code
 }
 
 # Function to remove JWT Validation policy via the CCF API
@@ -97,48 +98,71 @@ removeJwtValidationPolicy() {
         exit 1
     fi
 
-    # Send a curl request to the CCF API endpoint
-    response=$(curl -s "$KMS_URL/app/removeJwtValidationPolicy" \
-        --cacert "$KMS_SERVICE_CERT_PATH" \
-        --cert "$KMS_MEMBER_CERT_PATH" \
-        --key "$KMS_MEMBER_PRIVK_PATH" \
-        -H "Content-Type: application/json" \
-        -d "{\"issuer\": $issuer}" \
-        -w '\n%{http_code}\n')
 
-    # Extract status code from the response safely
-    status_code=$(echo "$response" | tail -n1 | grep -oE '[0-9]+')
+# Run cURL and capture response & status code
+response=$(curl -s "$KMS_URL/app/removeJwtValidationPolicy" \
+    --cacert "$KMS_SERVICE_CERT_PATH" \
+    --cert "$KMS_USER_CERT_PATH" \
+    --key "$KMS_USER_PRIVK_PATH" \
+    -H "Content-Type: application/json" \
+    -d "{\"issuer\": \"$issuer\"}" \
+    -w '\n%{http_code}\n')
 
-    if [[ -z "$status_code" ]]; then
-        echo "Error: No valid response received from the server."
-        exit 1
-    fi
+# Extract status code (last line)
+status_code=$(echo "$response" | tail -n1)
 
-    if [[ "$status_code" -ne 200 ]]; then
-        echo "Error: Failed to remove JWT Validation policy. Status code: $status_code"
-        exit 1
-    fi
+# Extract JSON response (all lines except last)
+json_response=$(echo "$response" | sed '$d')
 
-    echo "Removed JWT Validation policy successfully."
+# Ensure json_response is a valid JSON object, if empty default to {}
+if [[ -z "$json_response" ]]; then
+    json_response="{}"
+fi
+
+# Return a proper JSON response
+echo "{\"status_code\": \"$status_code\", \"message\": \"$json_response\"}"
+echo $status_code
+
 }
 
 # Main script logic
 main() {
     validate_env_vars
 
-    # Store operation in a variable
-    operation="$1"
-    shift
+    # Default values
+    action=""
+    
+    # Parse keyword arguments
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --action)
+                action="$2"
+                shift 2
+                ;;
+            *)
+                args+=("$1") # Store other args
+                shift
+                ;;
+        esac
+    done
 
-    case "$operation" in
+    # Ensure action is provided
+    if [[ -z "$action" ]]; then
+        echo "Error: --action must be provided."
+        usage
+        exit 1
+    fi
+
+    case "$action" in
         "set")
-            setJwtValidationPolicy "$@"
+            setJwtValidationPolicy "${args[@]}"
             ;;
         "remove")
-            removeJwtValidationPolicy "$@"
+            removeJwtValidationPolicy "${args[@]}"
             ;;
         *)
             usage
+            exit 1
             ;;
     esac
 }

@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-// Define an interface for the allowed claims
 export interface IKeyReleasePolicyClaims {
   secureboot?: boolean;
   "x-ms-attestation-type"?: string;

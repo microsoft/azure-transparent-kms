@@ -6,17 +6,19 @@ import { IKeyReleasePolicyClaims } from "./IKeyReleasePolicyClaims";
 
 export const add = (
   map: KeyReleaseClaimsPolicyStore,
+  claimType: string,
   claims: IKeyReleasePolicyClaims
 ): void => {
   console.log(`Add claims from key release policy: ${JSON.stringify(claims)}`);
-  map.storeClaims(claims);
+  map.storeClaims(claimType, claims);
 };
 
 
 export const remove = (
   map: KeyReleaseClaimsPolicyStore,
+  claimType: string,
   claims: IKeyReleasePolicyClaims
 ): void => {
   console.log(`Remove claims from key release policy : ${JSON.stringify(claims)}`);
-  map.removeClaims(claims);
+  map.removeClaims(claimType, claims);
 };

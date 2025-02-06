@@ -43,7 +43,7 @@ export const setJwtValidationPolicy = (
         // Validate and apply the policy
         addJwtValidationPolicyFromStore(jwtValidationPolicyMap, jwtValidationPolicy);
 
-        return ServiceResult.Succeeded<string>("Key rotation policy set successfully.", logContext);
+        return ServiceResult.Succeeded<string>("JWT Validation policy set successfully.", logContext);
     } catch (error: any) {
         return ServiceResult.Failed<string>({ errorMessage: error.message }, 500, logContext);
     }

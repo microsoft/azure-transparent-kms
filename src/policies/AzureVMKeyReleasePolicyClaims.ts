@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-export interface IKeyReleasePolicyClaims {
+export class AzureVMKeyReleasePolicyClaims {
   secureboot?: boolean;
   "x-ms-attestation-type"?: string;
   "x-ms-azurevm-os-provisioning.node-policy-identity.eventVersion"?: number;

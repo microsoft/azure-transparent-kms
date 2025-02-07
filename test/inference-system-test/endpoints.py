@@ -27,8 +27,6 @@ def call_endpoint(endpoint, **kwargs):
         .splitlines()
     )
 
-    print(response)
-    print(status_code)
     return (
         int(status_code),
         json.loads("".join(response) or "{}"),

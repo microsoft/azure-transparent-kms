@@ -32,13 +32,28 @@ keyReleasePolicyClaims() {
     fi
 
     # Send a curl request to the CCF API endpoint to set the key release claims
-    curl $KMS_URL/app/setkeyReleasePolicyClaims \
-        --cacert $KMS_SERVICE_CERT_PATH \ # Provide the service certificate for TLS
-        --cert $KMS_USER_CERT_PATH \    # Provide user's client certificate
-        --key $KMS_USER_PRIVK_PATH \    # Provide user's private key
-        -H "Content-Type: application/json" \ # Specify the content type as JSON
-        -d "{\"type\": \"$type\", \"claims\": $claims}" \ # Send the type and claims as JSON payload
-        -w '\n%{http_code}\n'             # Output the HTTP status code at the end of the response
+    response=$(curl -s "$KMS_URL/app/setKeyReleasePolicyClaims" \
+        --cacert "$KMS_SERVICE_CERT_PATH" \
+        --cert "$KMS_USER_CERT_PATH" \
+        --key "$KMS_USER_PRIVK_PATH" \
+        -H "Content-Type: application/json" \
+         -d "{\"claimType\": \"$type\", \"claims\": $claims}" \
+        -w '\n%{http_code}\n')
+
+    # Extract status code (last line)
+    status_code=$(echo "$response" | tail -n1)
+
+    # Extract JSON response (all lines except last)
+    json_response=$(echo "$response" | sed '$d')
+
+    # Ensure json_response is a valid JSON object, if empty default to {}
+    if [[ -z "$json_response" ]]; then
+        json_response="{}"
+    fi
+
+    # Return a proper JSON response
+    echo "{\"status_code\": \"$status_code\", \"message\": \"$json_response\"}"
+    echo $status_code
 }
 
 # Invoke the function to execute the key release claims operation

@@ -7,7 +7,7 @@ import { ServiceResult } from "../utils/ServiceResult";
 import { ServiceRequest } from "../utils/ServiceRequest";
 import { keyReleasePolicyMap } from "../repositories/Maps";
 import { LogContext } from "../utils/Logger";
-import { IKeyReleasePolicyClaims } from "../policies/IKeyReleasePolicyClaims";
+import { AzureVMKeyReleasePolicyClaims } from "../policies/AzureVMKeyReleasePolicyClaims";
 import { add, remove } from "../policies/KeyReleaseClaimsPolicy";
 
 // Enable the endpoint
@@ -19,15 +19,16 @@ enableEndpoint();
  * @returns A ServiceResult with the operation status.
  */
 export const setKeyReleasePolicyClaims = (
-  request: ccfapp.Request<{ claimType: string; claims: Partial<IKeyReleasePolicyClaims> }>, // Updated claims type
+  request: ccfapp.Request<{ claimType: string; claims: Partial<AzureVMKeyReleasePolicyClaims> }>, // Updated claims type
 ): ServiceResult<string> => {
 
   const logContext = new LogContext().appendScope("setKeyReleasePolicyClaimsEndpoint");
-  const serviceRequest = new ServiceRequest<{ claimType: string; claims: Partial<IKeyReleasePolicyClaims> }>(logContext, request);
+  const serviceRequest = new ServiceRequest<{ claimType: string; claims: Partial<AzureVMKeyReleasePolicyClaims> }>(logContext, request);
 
   // Check if caller has a valid identity
   const [_, isValidIdentity] = serviceRequest.isAuthenticated();
   if (isValidIdentity.failure) return isValidIdentity;
+  console.log(serviceRequest);
 
   const { body } = serviceRequest;
   if (!body || !body.claimType || !body.claims) {
@@ -39,18 +40,6 @@ export const setKeyReleasePolicyClaims = (
   }
 
   const { claimType, claims } = body;
-
-  // Validate claims: Ensure all keys exist in IKeyReleaseClaims
-  const validKeys = new Set(Object.keys({} as IKeyReleasePolicyClaims));
-  const invalidKeys = Object.keys(claims).filter(key => !validKeys.has(key));
-
-  if (invalidKeys.length > 0) {
-    return ServiceResult.Failed<string>(
-      { errorMessage: `Invalid claim keys detected: ${invalidKeys.join(", ")}` },
-      400,
-      logContext
-    );
-  }
 
   try {
     add(keyReleasePolicyMap, claimType, claims);
@@ -67,11 +56,11 @@ export const setKeyReleasePolicyClaims = (
  * @returns A ServiceResult with the operation status.
  */
 export const removeKeyReleasePolicyClaims = (
-  request: ccfapp.Request<{ claimType: string; claims: Partial<IKeyReleasePolicyClaims> }>, // Updated claims type
+  request: ccfapp.Request<{ claimType: string; claims: Partial<AzureVMKeyReleasePolicyClaims> }>, // Updated claims type
 ): ServiceResult<string> => {
 
   const logContext = new LogContext().appendScope("removeKeyReleasePolicyClaimsEndpoint");
-  const serviceRequest = new ServiceRequest<{ claimType: string; claims: Partial<IKeyReleasePolicyClaims> }>(logContext, request);
+  const serviceRequest = new ServiceRequest<{ claimType: string; claims: Partial<AzureVMKeyReleasePolicyClaims> }>(logContext, request);
 
   // Check if caller has a valid identity
   const [_, isValidIdentity] = serviceRequest.isAuthenticated();
@@ -89,7 +78,7 @@ export const removeKeyReleasePolicyClaims = (
   const { claimType, claims } = body;
 
   // Validate claims: Ensure all keys exist in IKeyReleaseClaims
-  const validKeys = new Set(Object.keys({} as IKeyReleasePolicyClaims));
+  const validKeys = new Set(Object.keys({} as AzureVMKeyReleasePolicyClaims));
   const invalidKeys = Object.keys(claims).filter(key => !validKeys.has(key));
 
   if (invalidKeys.length > 0) {

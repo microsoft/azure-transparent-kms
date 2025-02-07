@@ -2,12 +2,12 @@
 // Licensed under the MIT license.
 
 import { KeyReleaseClaimsPolicyStore } from "../repositories/KeyReleaseClaimsPolicyStore";
-import { IKeyReleasePolicyClaims } from "./IKeyReleasePolicyClaims";
+import { AzureVMKeyReleasePolicyClaims } from "./AzureVMKeyReleasePolicyClaims";
 
 export const add = (
   map: KeyReleaseClaimsPolicyStore,
   claimType: string,
-  claims: IKeyReleasePolicyClaims
+  claims: AzureVMKeyReleasePolicyClaims
 ): void => {
   console.log(`Add claims from key release policy: ${JSON.stringify(claims)}`);
   map.storeClaims(claimType, claims);
@@ -17,7 +17,7 @@ export const add = (
 export const remove = (
   map: KeyReleaseClaimsPolicyStore,
   claimType: string,
-  claims: IKeyReleasePolicyClaims
+  claims: AzureVMKeyReleasePolicyClaims
 ): void => {
   console.log(`Remove claims from key release policy : ${JSON.stringify(claims)}`);
   map.removeClaims(claimType, claims);

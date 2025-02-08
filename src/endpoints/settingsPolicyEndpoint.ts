@@ -17,6 +17,8 @@ enableEndpoint();
 const key = "settings_policy";
 const keyBuf = ccf.strToBuf(key);
 
+const settingsPolicyMapName = "public:settings_policy";
+
 /**
  * Endpoint to set the Settings Policy.
  * @param request A CCF request containing the settings olicy.
@@ -47,7 +49,7 @@ export const setSettingsPolicy = (
         // Validate and apply the policy
         const jsonItems = JSON.stringify(settings_policy);
         const jsonItemsBuf = ccf.strToBuf(jsonItems);
-        ccf.kv[settingsMapName].set(keyBuf, jsonItemsBuf);
+        ccf.kv[settingsPolicyMapName].set(keyBuf, jsonItemsBuf);
         console.log(
           `[INFO] [scope=set_settings_policy] Settings policy ${jsonItems} saved in ${settingsMapName}`,
         );

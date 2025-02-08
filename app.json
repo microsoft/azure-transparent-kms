@@ -31,7 +31,7 @@
         "js_function": "settingsPolicy",
         "forwarding_required": "sometimes",
         "authn_policies": [
-          "member_cert",
+          "user_cert",
           "jwt"
         ],
         "mode": "readonly",
@@ -44,6 +44,25 @@
                   "type": "object"
                 }
               }
+            }
+          }
+        }
+      }
+    },
+    "/setSettingsPolicy": {
+      "post": {
+        "js_module": "endpoints/settingsPolicyEndpoint.js",
+        "js_function": "setSettingsPolicy",
+        "forwarding_required": "always",
+        "authn_policies": [
+          "user_cert",
+          "jwt"
+        ],
+        "mode": "readwrite",
+        "openapi": {
+          "responses": {
+            "200": {
+              "description": "Set Settings Policy"
             }
           }
         }

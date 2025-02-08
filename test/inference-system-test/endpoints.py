@@ -54,7 +54,19 @@ def keyReleasePolicy(**kwargs):
 
 
 def settingsPolicy(**kwargs):
-    return call_endpoint("settingsPolicy", **kwargs)
+    return call_endpoint("settingsPolicy", action="get", **kwargs)
+
+
+def setSettingsPolicy(settings_policy: dict):
+    if not settings_policy:
+        raise ValueError("'settings_policy' is required.")
+
+    set_settings_policy_json = json.dumps(
+        settings_policy
+    )  # Convert the claims dictionary to a JSON string
+    return call_endpoint(
+        "settings_policy", action="set", policy=set_settings_policy_json
+    )
 
 
 def auth(**kwargs):
@@ -93,7 +105,6 @@ def setJwtValidationPolicy(jwt_validation_policy: dict):
     return call_endpoint(
         "jwt_validation_policy", action="set", policy=jwt_validation_policy
     )
-
 
 def removeJwtValidationPolicy(issuer: str):
     return call_endpoint("jwt_validation_policy", action="remove", issuer=issuer)

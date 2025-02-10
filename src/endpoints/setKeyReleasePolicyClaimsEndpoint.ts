@@ -5,13 +5,16 @@ import * as ccfapp from "@microsoft/ccf-app";
 import { enableEndpoint } from "../utils/Tooling";
 import { ServiceResult } from "../utils/ServiceResult";
 import { ServiceRequest } from "../utils/ServiceRequest";
-import { keyReleasePolicyMap } from "../repositories/Maps";
+import { keyReleasePolicyApplicationTableMap } from "../repositories/Maps";
 import { LogContext } from "../utils/Logger";
 import { AzureVMKeyReleasePolicyClaims } from "../policies/AzureVMKeyReleasePolicyClaims";
 import { add, remove } from "../policies/KeyReleaseClaimsPolicy";
 
 // Enable the endpoint
 enableEndpoint();
+// Override this by reading Default Settings
+// By Default Ledger_Type is MCCF
+var ledgerType = "acl";
 
 /**
  * Adds or removes claims in the key release policy.
@@ -24,6 +27,10 @@ export const setKeyReleasePolicyClaims = (
 
   const logContext = new LogContext().appendScope("setKeyReleasePolicyClaimsEndpoint");
   const serviceRequest = new ServiceRequest<{ claimType: string; claims: Partial<AzureVMKeyReleasePolicyClaims> }>(logContext, request);
+
+  if (ledgerType.toLowerCase() !== "acl") {
+    throw new Error(`Unsupported Operation for LEDGER_TYPE: ${ledgerType}`);
+  }
 
   // Check if caller has a valid identity
   const [_, isValidIdentity] = serviceRequest.isAuthenticated();
@@ -42,7 +49,7 @@ export const setKeyReleasePolicyClaims = (
   const { claimType, claims } = body;
 
   try {
-    add(keyReleasePolicyMap, claimType, claims);
+    add(keyReleasePolicyApplicationTableMap, claimType, claims);
     return ServiceResult.Succeeded<string>(`Operation ${claimType} successful.`, logContext);
   } catch (error: any) {
     return ServiceResult.Failed<string>({ errorMessage: error.message }, 500, logContext);
@@ -61,6 +68,10 @@ export const removeKeyReleasePolicyClaims = (
 
   const logContext = new LogContext().appendScope("removeKeyReleasePolicyClaimsEndpoint");
   const serviceRequest = new ServiceRequest<{ claimType: string; claims: Partial<AzureVMKeyReleasePolicyClaims> }>(logContext, request);
+
+  if (ledgerType.toLowerCase() !== "acl") {
+    throw new Error(`Unsupported Operation for LEDGER_TYPE: ${ledgerType}`);
+  }
 
   // Check if caller has a valid identity
   const [_, isValidIdentity] = serviceRequest.isAuthenticated();
@@ -90,7 +101,7 @@ export const removeKeyReleasePolicyClaims = (
   }
 
   try {
-    remove(keyReleasePolicyMap, claimType, claims);
+    remove(keyReleasePolicyApplicationTableMap, claimType, claims);
     return ServiceResult.Succeeded<string>(`Operation ${claimType} successful.`, logContext);
   } catch (error: any) {
     return ServiceResult.Failed<string>({ errorMessage: error.message }, 500, logContext);

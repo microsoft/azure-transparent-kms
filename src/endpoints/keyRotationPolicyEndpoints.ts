@@ -12,6 +12,9 @@ import { applyKeyRotationPolicy, getKeyRotationPolicyFromMap, validateKeyRotatio
 
 // Enable the endpoint
 enableEndpoint();
+// Override this by reading Default Settings
+// By Default Ledger_Type is MCCF
+var ledgerType = "acl";
 
 /**
  * Endpoint to set key rotation policy.
@@ -23,6 +26,10 @@ export const setKeyRotationPolicy = (
 ): ServiceResult<string> => {
     const logContext = new LogContext().appendScope("setKeyRotationPolicyEndpoint");
     const serviceRequest = new ServiceRequest<{ key_rotation_policy: IKeyRotationPolicy }>(logContext, request);
+
+    if (ledgerType.toLowerCase() !== "acl") {
+        throw new Error(`Unsupported Operation for LEDGER_TYPE: ${ledgerType}`);
+    }
 
     // Check if caller has a valid identity
     const [_, isValidIdentity] = serviceRequest.isAuthenticated();
@@ -59,6 +66,10 @@ export const getKeyRotationPolicy = (
 ): ServiceResult<string | IKeyRotationPolicy> => {
     const logContext = new LogContext().appendScope("getKeyRotationPolicyEndpoint");
     const serviceRequest = new ServiceRequest<void>(logContext, request);
+
+    if (ledgerType.toLowerCase() !== "acl") {
+        throw new Error(`Unsupported Operation for LEDGER_TYPE: ${ledgerType}`);
+    }
 
     // Check if caller has a valid identity
     const [_, isValidIdentity] = serviceRequest.isAuthenticated();

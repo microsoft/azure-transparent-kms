@@ -12,10 +12,14 @@ import { JwtValidationPolicyStore } from "./JwtValidationPolicyStore";
 // Stores
 export const hpkeKeysMap = new KeyStore("HpkeKeys");
 export const hpkeKeyIdMap = new LastestItemStore<number, string>("HpkeKeyids");
-export const keyReleaseMapName = "public:kms.policies.key_release";
-export const keyReleasePolicyMap = new KeyReleaseClaimsPolicyStore(keyReleaseMapName);
+export const keyReleaseMapName = "public:ccf.gov.policies.key_release";
+export const keyReleasePolicyMap = ccf.kv[keyReleaseMapName];
+export const keyReleasePolicyApplicationTableName = "public:kms.policies.key_release";
+export const keyReleasePolicyApplicationTableMap = new KeyReleaseClaimsPolicyStore(keyReleasePolicyApplicationTableName);
 export const settingsMapName = "public:ccf.gov.policies.settings";
 export const settingsPolicyMap = ccf.kv[settingsMapName];
+export const settingsApplicationTableMapName = "public:kms.policies.settings";
+export const settingsPolicyApplicationTableMap = ccf.kv[settingsApplicationTableMapName];
 export const keyRotationSetName = "public:kms.policies.key_rotation";
 export const keyRotationPolicySet = new KeyRotationPolicyStore(keyRotationSetName);
 export const jwtValidationPolicyMapName = "public:kms.policies.jwt_validation";

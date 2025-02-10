@@ -6,8 +6,8 @@
 # Function to display usage instructions
 usage() {
     echo "Usage:"
-    echo "  jwtValidationPolicy.sh set --policy <jwtValidationPolicy-json>"
-    echo "  jwtValidationPolicy.sh remove --issuer <issuer>"
+    echo "  settings_policy_app_endpt.sh set --policy <settings-json>"
+    echo "  settings_policy_app_endpt.sh get"
     exit 1
 }
 
@@ -33,7 +33,7 @@ setSettingsPolicy() {
     if [[ "$1" == "--policy" && -n "$2" ]]; then
         policy="$2"
     else
-        echo "Error: Missing or invalid JWT validation policy."
+        echo "Error: Missing or invalid settings policy."
         usage
     fi
 
@@ -51,17 +51,17 @@ setSettingsPolicy() {
 
     # Validate JSON format
     if ! echo "$policy" | jq . > /dev/null 2>&1; then
-        echo "Error: Invalid JSON provided for jwtValidationPolicy."
+        echo "Error: Invalid JSON provided for setSettingsPolicy."
         exit 1
     fi
 
     # Send a curl request to the CCF API endpoint
-    response=$(curl -s "$KMS_URL/app/setJwtValidationPolicy" \
+    response=$(curl -s "$KMS_URL/app/setSettingsPolicyAppTable" \
         --cacert "$KMS_SERVICE_CERT_PATH" \
         --cert "$KMS_USER_CERT_PATH" \
         --key "$KMS_USER_PRIVK_PATH" \
         -H "Content-Type: application/json" \
-        -d "{\"jwt_validation_policy\": $policy}" \
+        -d "{\"settings_policy\": $policy}" \
         -w '\n%{http_code}\n')
 
     # Extract status code (last line)
@@ -83,7 +83,7 @@ setSettingsPolicy() {
 # Function to set Settings Policy
 getSettingsPolicy() {
     # Send a curl request to the CCF API endpoint
-    response=$(curl -s "$KMS_URL/app/settingsPolicy" \
+    response=$(curl -s "$KMS_URL/app/getSettingsPolicyAppTable" \
         --cacert "$KMS_SERVICE_CERT_PATH" \
         --cert "$KMS_USER_CERT_PATH" \
         --key "$KMS_USER_PRIVK_PATH" \
@@ -149,32 +149,3 @@ main() {
 
 # Execute main function with arguments
 main "$@"
-
-# settingsPolicy() {
-#     auth="member_cert"
-
-#     while [[ $# -gt 0 ]]; do
-#         case "$1" in
-#             --auth)
-#                 auth="$2"
-#                 shift 2
-#                 ;;
-#             *)
-#                 echo "Unknown parameter: $1"
-#                 exit 1
-#                 ;;
-#         esac
-#     done
-
-#     auth_arg=()
-#     if [[ "$auth" == "member_cert" ]]; then
-#         auth_arg=(--cert $KMS_MEMBER_CERT_PATH --key $KMS_MEMBER_PRIVK_PATH)
-#     fi
-
-#     curl $KMS_URL/app/settingsPolicy \
-#         --cacert $KMS_SERVICE_CERT_PATH \
-#         "${auth_arg[@]}" \
-#         -w '\n%{http_code}\n'
-# }
-
-# settingsPolicy "$@"

@@ -12,8 +12,8 @@ def call_endpoint(endpoint, **kwargs):
 
     command = [f"scripts/kms/endpoints/{endpoint}.sh"]
     for k, v in kwargs.items():
-        if isinstance(v, dict):
-            v = json.dumps(v)
+        # if isinstance(v, dict):
+        #     v = json.dumps(v)
         command.extend([f'--{k.replace("_", "-")}', str(v)])
 
     *response, status_code = (
@@ -54,10 +54,12 @@ def keyReleasePolicy(**kwargs):
 
 
 def settingsPolicy(**kwargs):
-    return call_endpoint("settingsPolicy", action="get", **kwargs)
+    return call_endpoint("settings_policy", **kwargs)
 
+def getSettingsPolicyApplicationEndpt(**kwargs):
+    return call_endpoint("settings_policy_app_endpt", action="get", **kwargs)
 
-def setSettingsPolicy(settings_policy: dict):
+def setSettingsPolicyApplicationEndpt(settings_policy: dict):
     if not settings_policy:
         raise ValueError("'settings_policy' is required.")
 
@@ -65,13 +67,11 @@ def setSettingsPolicy(settings_policy: dict):
         settings_policy
     )  # Convert the claims dictionary to a JSON string
     return call_endpoint(
-        "settings_policy", action="set", policy=set_settings_policy_json
+        "settings_policy_app_endpt", action="set", policy=set_settings_policy_json
     )
-
 
 def auth(**kwargs):
     return call_endpoint("auth", **kwargs)
-
 
 def setKeyReleaseClaims(type: str, claims: dict):
     if not type or not claims:
@@ -79,7 +79,6 @@ def setKeyReleaseClaims(type: str, claims: dict):
 
     claims_json = json.dumps(claims)  # Convert the claims dictionary to a JSON string
     return call_endpoint("key_release_policy_claims", type=type, claims=claims_json)
-
 
 def setKeyRotationPolicy(key_rotation_policy: dict):
     if not key_rotation_policy:
@@ -90,10 +89,8 @@ def setKeyRotationPolicy(key_rotation_policy: dict):
     )  # Convert the claims dictionary to a JSON string
     return call_endpoint("key_rotation_policy", action="set", policy=key_rotation_policy_json)
 
-
 def getKeyRotationPolicy():
     return call_endpoint("key_rotation_policy", action="get")
-
 
 def setJwtValidationPolicy(jwt_validation_policy: dict):
     if not jwt_validation_policy:
@@ -103,7 +100,7 @@ def setJwtValidationPolicy(jwt_validation_policy: dict):
         jwt_validation_policy
     )  # Convert the claims dictionary to a JSON string
     return call_endpoint(
-        "jwt_validation_policy", action="set", policy=jwt_validation_policy
+        "jwt_validation_policy", action="set", policy=jwt_validation_policy_json
     )
 
 def removeJwtValidationPolicy(issuer: str):

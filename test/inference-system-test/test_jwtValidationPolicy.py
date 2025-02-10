@@ -1,7 +1,9 @@
+import os
 import pytest
 from endpoints import setJwtValidationPolicy, removeJwtValidationPolicy
 
-
+LEDGER_TYPE = os.getenv("LEDGER_TYPE", "MCCF").lower()
+@pytest.mark.skipif(LEDGER_TYPE == "mccf", reason="MCCF does not support JWT validation policy endpoint")
 def test_set_jwtValidationPolicy(setup_kms):
     # Add claims
     status_code, response = setJwtValidationPolicy(
@@ -26,7 +28,8 @@ def test_set_jwtValidationPolicy(setup_kms):
     status_code, response = removeJwtValidationPolicy(issuer="test-issuer")
     assert status_code == 200
 
-
+LEDGER_TYPE = os.getenv("LEDGER_TYPE", "MCCF").lower()
+@pytest.mark.skipif(LEDGER_TYPE == "mccf", reason="MCCF does not support JWT validation policy endpoint")
 def test_removeJwtValidationPolicy(setup_kms):
     # Remove Test issue
     status_code, response = removeJwtValidationPolicy(issuer="test-issuer")

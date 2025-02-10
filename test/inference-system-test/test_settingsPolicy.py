@@ -3,11 +3,11 @@ import pytest
 from utils import (
     apply_kms_constitution,
     apply_settings_policy,
-    remove_key_release_policy,
 )
 from endpoints import settingsPolicy
 
-
+LEDGER_TYPE = os.getenv("LEDGER_TYPE", "ACL").lower()
+@pytest.mark.skipif(LEDGER_TYPE == "acl", reason="ACL does not support Gov Settings Policy")
 def test_settingsPolicy_with_no_policy(setup_kms):
     status_code, settings_json = settingsPolicy()
     assert status_code == 200
@@ -17,15 +17,18 @@ def test_settingsPolicy_with_no_policy(setup_kms):
             "description": "Key Management Service",
             "version": "1.0.0",
             "debug": False,
+            "ledgerType": "mccf"
         }
     }
 
-
+LEDGER_TYPE = os.getenv("LEDGER_TYPE", "ACL").lower()
+@pytest.mark.skipif(LEDGER_TYPE == "acl", reason="ACL does not support Gov Settings Policy")
 def test_settingsPolicy_with_no_auth(setup_kms):
     status_code, settings_json = settingsPolicy(auth=None)
     assert status_code == 401
 
-
+LEDGER_TYPE = os.getenv("LEDGER_TYPE", "ACL").lower()
+@pytest.mark.skipif(LEDGER_TYPE == "acl", reason="ACL does not support Gov Settings Policy")
 def test_settingsPolicy_with_policy(setup_kms):
     apply_kms_constitution()
 
@@ -35,6 +38,7 @@ def test_settingsPolicy_with_policy(setup_kms):
             "description": "Custom Key Management Service",
             "version": "2.0.0",
             "debug": True,
+            "ledgerType": "mccf"
         }
     }
     apply_settings_policy(policy)
@@ -43,7 +47,8 @@ def test_settingsPolicy_with_policy(setup_kms):
     assert status_code == 200
     assert settings_json == policy
 
-
+LEDGER_TYPE = os.getenv("LEDGER_TYPE", "ACL").lower()
+@pytest.mark.skipif(LEDGER_TYPE == "acl", reason="ACL does not support Gov Settings Policy")
 def test_settingsPolicy_with_multiple_policy_sets(setup_kms):
     apply_kms_constitution()
 
@@ -53,6 +58,7 @@ def test_settingsPolicy_with_multiple_policy_sets(setup_kms):
             "description": "Custom Key Management Service",
             "version": "2.0.0",
             "debug": True,
+            "ledgerType": "mccf"
         }
     }
     apply_settings_policy(policy)
@@ -66,6 +72,7 @@ def test_settingsPolicy_with_multiple_policy_sets(setup_kms):
             "description": "Custom Key Management Service 2",
             "version": "2.0.1",
             "debug": False,
+            "ledgerType": "mccf"
         }
     }
     apply_settings_policy(different_policy)

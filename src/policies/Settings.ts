@@ -11,6 +11,7 @@ export interface IService {
   description: string;
   version: string;
   debug: boolean;
+  ledgerType: string | "mccf";
 }
 
 // Define the ISettings interface
@@ -36,6 +37,7 @@ export class Settings {
         description: "Key Management Service",
         version: "1.0.0",
         debug: false,
+        ledgerType: "mccf",
       },
     };
   }

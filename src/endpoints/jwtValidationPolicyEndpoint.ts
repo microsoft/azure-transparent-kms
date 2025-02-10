@@ -12,6 +12,9 @@ import { addJwtValidationPolicyFromStore, removeJwtValidationPolicyFromStore } f
 
 // Enable the endpoint
 enableEndpoint();
+// Override this by reading Default Settings
+// By Default Ledger_Type is MCCF
+var ledgerType = "acl";
 
 /**
  * Endpoint to set JWT Validation Policy.
@@ -23,6 +26,10 @@ export const setJwtValidationPolicy = (
 ): ServiceResult<string> => {
     const logContext = new LogContext().appendScope("setJwtValidationPolicyEndpoint");
     const serviceRequest = new ServiceRequest<{ jwt_validation_policy: IJwtValidationPolicy }>(logContext, request);
+
+    if (ledgerType.toLowerCase() !== "acl") {
+        throw new Error(`Unsupported Operation for LEDGER_TYPE: ${ledgerType}`);
+    }
 
     // Check if caller has a valid identity
     const [_, isValidIdentity] = serviceRequest.isAuthenticated();
@@ -59,6 +66,9 @@ export const removeJwtValidationPolicy = (
 ): ServiceResult<string> => {
     const logContext = new LogContext().appendScope("removeJwtValidationPolicy");
     const serviceRequest = new ServiceRequest<{ issuer: string }>(logContext, request);
+    if (ledgerType.toLowerCase() !== "acl") {
+        throw new Error(`Unsupported Operation for LEDGER_TYPE: ${ledgerType}`);
+    }
 
     // Check if caller has a valid identity
     const [_, isValidIdentity] = serviceRequest.isAuthenticated();

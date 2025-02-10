@@ -30,10 +30,7 @@
         "js_module": "endpoints/settingsPolicyEndpoint.js",
         "js_function": "settingsPolicy",
         "forwarding_required": "sometimes",
-        "authn_policies": [
-          "user_cert",
-          "jwt"
-        ],
+        "authn_policies": ["member_cert", "jwt"],
         "mode": "readonly",
         "openapi": {
           "responses": {
@@ -49,9 +46,9 @@
         }
       }
     },
-    "/setSettingsPolicy": {
+    "/setSettingsPolicyAppTable": { 
       "post": {
-        "js_module": "endpoints/settingsPolicyEndpoint.js",
+        "js_module": "endpoints/settingsPolicyAppEndpoint.js",
         "js_function": "setSettingsPolicy",
         "forwarding_required": "always",
         "authn_policies": [
@@ -63,6 +60,25 @@
           "responses": {
             "200": {
               "description": "Set Settings Policy"
+            }
+          }
+        }
+      }
+    },
+    "/getSettingsPolicyAppTable": {
+      "get": {
+        "js_module": "endpoints/settingsPolicyAppEndpoint.js",
+        "js_function": "getSettingsPolicy",
+        "forwarding_required": "always",
+        "authn_policies": [
+          "user_cert",
+          "jwt"
+        ],
+        "mode": "readonly",
+        "openapi": {
+          "responses": {
+            "200": {
+              "description": "Get Settings Policy"
             }
           }
         }

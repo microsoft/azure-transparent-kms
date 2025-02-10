@@ -7,6 +7,10 @@ KEYS_DIR ?= ${KMS_WORKSPACE}/sandbox_common
 RUN_BACK ?= true
 CCF_PLATFORM ?= virtual
 
+# Define LEDGER_TYPE variable (defaults to MCCF if not set)
+LEDGER_TYPE ?= MCCF
+
+
 DEPLOYMENT_ENV ?= $(if $(shell echo $(KMS_URL) | grep -E '127.0.0.1|localhost'),local,cloud)
 
 ifndef MEMBER_COUNT
@@ -33,7 +37,7 @@ help: ## 💬 This help message :)
 
 build: ## 🔨 Build the Application
 	@echo -e "\e[34m$@\e[0m" || true;
-	./scripts/set_python_env.sh
+	LEDGER_TYPE=${LEDGER_TYPE} ./scripts/set_python_env.sh
 	npm install
 	npm run build
 
@@ -132,7 +136,7 @@ setup-mCCF: set-constitution-maa deploy propose-add-key-release-policy-maa propo
 # The following are here in case you forget to change directory!
 deploy: build ## 🚀 Deploy Managed CCF or local
 	@echo -e "\e[34m$@\e[0m" || true
-	@CCF_PLATFORM=${CCF_PLATFORM} ./scripts/deploy.sh --network-url "${KMS_URL}"  --certificate_dir "${KEYS_DIR}"
+	LEDGER_TYPE=${LEDGER_TYPE} @CCF_PLATFORM=${CCF_PLATFORM} ./scripts/deploy.sh --network-url "${KMS_URL}"  --certificate_dir "${KEYS_DIR}"
 
 lint: ## 🔍 Lint the code base (but don't fix)
 	@echo -e "\e[34m$@\e[0m" || true
@@ -205,7 +209,7 @@ test-unit:
 	npm run test
 
 test-system-inference:
-	@pytest -s test/inference-system-test/$(filter-out $@,$(MAKECMDGOALS))
+	LEDGER_TYPE=${LEDGER_TYPE} @pytest -s test/inference-system-test/$(filter-out $@,$(MAKECMDGOALS))
 
 # Keep this at the bottom.
 clean: ## 🧹 Clean the working folders created during build/demo

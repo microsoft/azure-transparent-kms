@@ -4,12 +4,11 @@
 import * as ccfapp from "@microsoft/ccf-app";
 import { ServiceResult } from "../utils/ServiceResult";
 import { enableEndpoint } from "../utils/Tooling";
-import { keyReleaseMapName } from "../repositories/Maps";
+import { keyReleasePolicyMap } from "../repositories/Maps";
 import { ServiceRequest } from "../utils/ServiceRequest";
 import { KeyReleasePolicy } from "../policies/KeyReleasePolicy";
 import { IKeyReleasePolicy } from "../policies/IKeyReleasePolicy";
 import { LogContext } from "../utils/Logger";
-import { ccf } from "@microsoft/ccf-app/global";
 
 // Enable the endpoint
 enableEndpoint();
@@ -30,7 +29,7 @@ export const keyReleasePolicy = (
 
   try {
     const result =
-      KeyReleasePolicy.getKeyReleasePolicyFromMap(ccf.kv[keyReleaseMapName], logContext);
+      KeyReleasePolicy.getKeyReleasePolicyFromMap(keyReleasePolicyMap, logContext);
       return ServiceResult.Succeeded<IKeyReleasePolicy>(result, logContext);
   } catch (error: any) {
     return ServiceResult.Failed<string>({ errorMessage: error.message }, 500, logContext);

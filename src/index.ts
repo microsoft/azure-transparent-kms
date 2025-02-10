@@ -7,6 +7,7 @@ export * from "./inference/publickeyEndpoint";
 export * from "./inference/refreshEndpoint";
 export * from "./endpoints/keyReleasePolicyEndpoint";
 export * from "./endpoints/settingsPolicyEndpoint";
+export * from "./endpoints/settingsPolicyAppEndpoint";
 export * from "./endpoints/IKeyItem";
 export * from "./endpoints/KeyGeneration";
 export * from "./endpoints/TinkKey";

@@ -2,7 +2,7 @@ import pytest
 from endpoints import setKeyRotationPolicy, getKeyRotationPolicy
 
 
-def test_set_keyRotationPolicy(setup_kms):
+def test_set_keyRotationPolicy(setup_kms, set_exclude_app_table_env):
     # Add claims
     status_code, key_release_json = setKeyRotationPolicy(
         key_rotation_policy={"rotation_interval_seconds": 30, "grace_period_seconds": 5}

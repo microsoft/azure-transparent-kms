@@ -28,10 +28,20 @@ def setup_kms():
     os.environ["JWT_TOKEN_ISSUER_URL"] = "http://localhost:3000/token"
     os.environ["JWT_ISSUER"] = "http://Demo-jwt-issuer"
 
-    deploy_app_code()
+    if os.getenv("EXCLUDE_APPTABLE_ENDPTS") == "true":
+        deploy_app_code()
+    else:
+        deploy_app_code(include_apptable_endpts=True)
 
     yield
 
     subprocess.run(
         f"scripts/{TEST_ENVIRONMENT}/down.sh",
     )
+
+@pytest.fixture(scope="function", autouse=True)
+def set_exclude_app_table_env():
+    """Fixture to temporarily set EXCLUDE_APPTABLE_ENDPTS to 'true' for tests"""
+    os.environ["EXCLUDE_APPTABLE_ENDPTS"] = "true"
+    yield  # Run the test
+    del os.environ["EXCLUDE_APPTABLE_ENDPTS"]  # Cleanup after test

@@ -7,9 +7,11 @@ import tempfile
 REPO_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 
-def deploy_app_code():
+def deploy_app_code(include_apptable_endpts=False):
+    
+    exclude_apptable_endpts_flag = "false" if include_apptable_endpts else "true"
     subprocess.run(
-        "scripts/kms/js_app_set.sh",
+        ["scripts/kms/js_app_set.sh", exclude_apptable_endpts_flag],
         cwd=REPO_ROOT,
         check=True,
     )

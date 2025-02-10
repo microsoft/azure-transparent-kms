@@ -1,8 +1,9 @@
+import os
 import pytest
 from endpoints import setJwtValidationPolicy, removeJwtValidationPolicy
 
 
-def test_set_jwtValidationPolicy(setup_kms):
+def test_set_jwtValidationPolicy(setup_kms, set_exclude_app_table_env):
     # Add claims
     status_code, response = setJwtValidationPolicy(
         jwt_validation_policy={
@@ -27,7 +28,7 @@ def test_set_jwtValidationPolicy(setup_kms):
     assert status_code == 200
 
 
-def test_removeJwtValidationPolicy(setup_kms):
+def test_removeJwtValidationPolicy(setup_kms, set_exclude_app_table_env):
     # Remove Test issue
     status_code, response = removeJwtValidationPolicy(issuer="test-issuer")
     assert status_code == 200

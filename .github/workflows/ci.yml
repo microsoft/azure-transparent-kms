@@ -5,13 +5,13 @@ permissions:
   contents: read
 
 on:
-  workflow_dispatch:  # Temporary for testing to verify tests pass
-  # push:
-  #   branches: [dev]
-  # pull_request:
-  #   branches: [dev]
-  # schedule:
-  #   - cron: "0 23 * * *"
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev]
+  workflow_dispatch:
+  schedule:
+    - cron: "0 23 * * *"
 
 jobs:
   lint:

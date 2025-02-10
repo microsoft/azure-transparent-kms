@@ -7,14 +7,12 @@ import { ServiceResult } from "../utils/ServiceResult";
 import { ServiceRequest } from "../utils/ServiceRequest";
 import { LogContext } from "../utils/Logger";
 import { IJwtValidationPolicy } from "../policies/IJwtValidationPolicy";
-import { jwtValidationPolicyMap } from "../repositories/Maps";
+import { jwtValidationPolicyMap, settingsPolicyMap } from "../repositories/Maps";
 import { addJwtValidationPolicyFromStore, removeJwtValidationPolicyFromStore } from "../policies/JwtValidationPolicy";
+import { Settings } from "../policies/Settings";
 
 // Enable the endpoint
 enableEndpoint();
-// Override this by reading Default Settings
-// By Default Ledger_Type is MCCF
-var ledgerType = "acl";
 
 /**
  * Endpoint to set JWT Validation Policy.
@@ -26,11 +24,16 @@ export const setJwtValidationPolicy = (
 ): ServiceResult<string> => {
     const logContext = new LogContext().appendScope("setJwtValidationPolicyEndpoint");
     const serviceRequest = new ServiceRequest<{ jwt_validation_policy: IJwtValidationPolicy }>(logContext, request);
+    let appSettings: Settings = Settings.loadSettingsFromMap(settingsPolicyMap, logContext);
 
-    if (ledgerType.toLowerCase() !== "acl") {
-        throw new Error(`Unsupported Operation for LEDGER_TYPE: ${ledgerType}`);
+    console.log(appSettings.settings.service);
+    if (appSettings.settings.service.ledgerType !== "acl") {
+        return ServiceResult.Failed<string>(
+            { errorMessage: `Invalid Operation: for LedgerType:${appSettings.settings.service.ledgerType}` },
+            400,
+            logContext
+        );
     }
-
     // Check if caller has a valid identity
     const [_, isValidIdentity] = serviceRequest.isAuthenticated();
     if (isValidIdentity.failure) return isValidIdentity;
@@ -66,8 +69,15 @@ export const removeJwtValidationPolicy = (
 ): ServiceResult<string> => {
     const logContext = new LogContext().appendScope("removeJwtValidationPolicy");
     const serviceRequest = new ServiceRequest<{ issuer: string }>(logContext, request);
-    if (ledgerType.toLowerCase() !== "acl") {
-        throw new Error(`Unsupported Operation for LEDGER_TYPE: ${ledgerType}`);
+    let appSettings: Settings = Settings.loadSettingsFromMap(settingsPolicyMap, logContext);
+
+    console.log(appSettings.settings.service);
+    if (appSettings.settings.service.ledgerType !== "acl") {
+        return ServiceResult.Failed<string>(
+            { errorMessage: `Invalid Operation: for LedgerType:${appSettings.settings.service.ledgerType}` },
+            400,
+            logContext
+        );
     }
 
     // Check if caller has a valid identity

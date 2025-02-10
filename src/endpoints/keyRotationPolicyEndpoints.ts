@@ -5,16 +5,14 @@ import * as ccfapp from "@microsoft/ccf-app";
 import { enableEndpoint } from "../utils/Tooling";
 import { ServiceResult } from "../utils/ServiceResult";
 import { ServiceRequest } from "../utils/ServiceRequest";
-import { keyRotationPolicySet } from "../repositories/Maps";
+import { keyRotationPolicySet, settingsPolicyMap } from "../repositories/Maps";
 import { LogContext } from "../utils/Logger";
 import { IKeyRotationPolicy } from "../policies/IKeyRotationPolicy";
 import { applyKeyRotationPolicy, getKeyRotationPolicyFromMap, validateKeyRotationPolicy } from "../policies/KeyRotationPolicy";
+import { Settings } from "../policies/Settings";
 
 // Enable the endpoint
 enableEndpoint();
-// Override this by reading Default Settings
-// By Default Ledger_Type is MCCF
-var ledgerType = "acl";
 
 /**
  * Endpoint to set key rotation policy.
@@ -26,9 +24,15 @@ export const setKeyRotationPolicy = (
 ): ServiceResult<string> => {
     const logContext = new LogContext().appendScope("setKeyRotationPolicyEndpoint");
     const serviceRequest = new ServiceRequest<{ key_rotation_policy: IKeyRotationPolicy }>(logContext, request);
+    let appSettings: Settings = Settings.loadSettingsFromMap(settingsPolicyMap, logContext);
 
-    if (ledgerType.toLowerCase() !== "acl") {
-        throw new Error(`Unsupported Operation for LEDGER_TYPE: ${ledgerType}`);
+    console.log(appSettings.settings.service);
+    if (appSettings.settings.service.ledgerType !== "acl") {
+        return ServiceResult.Failed<string>(
+            { errorMessage: `Invalid Operation: for LedgerType:${appSettings.settings.service.ledgerType}` },
+            400,
+            logContext
+        );
     }
 
     // Check if caller has a valid identity
@@ -67,8 +71,15 @@ export const getKeyRotationPolicy = (
     const logContext = new LogContext().appendScope("getKeyRotationPolicyEndpoint");
     const serviceRequest = new ServiceRequest<void>(logContext, request);
 
-    if (ledgerType.toLowerCase() !== "acl") {
-        throw new Error(`Unsupported Operation for LEDGER_TYPE: ${ledgerType}`);
+    let appSettings: Settings = Settings.loadSettingsFromMap(settingsPolicyMap, logContext);
+
+    console.log(appSettings.settings.service);
+    if (appSettings.settings.service.ledgerType !== "acl") {
+        return ServiceResult.Failed<string>(
+            { errorMessage: `Invalid Operation: for LedgerType:${appSettings.settings.service.ledgerType}` },
+            400,
+            logContext
+        );
     }
 
     // Check if caller has a valid identity

@@ -5,16 +5,14 @@ import * as ccfapp from "@microsoft/ccf-app";
 import { enableEndpoint } from "../utils/Tooling";
 import { ServiceResult } from "../utils/ServiceResult";
 import { ServiceRequest } from "../utils/ServiceRequest";
-import { keyReleasePolicyApplicationTableMap } from "../repositories/Maps";
+import { keyReleasePolicyApplicationTableMap, settingsPolicyMap } from "../repositories/Maps";
 import { LogContext } from "../utils/Logger";
 import { AzureVMKeyReleasePolicyClaims } from "../policies/AzureVMKeyReleasePolicyClaims";
 import { add, remove } from "../policies/KeyReleaseClaimsPolicy";
+import { Settings } from "../policies/Settings";
 
 // Enable the endpoint
 enableEndpoint();
-// Override this by reading Default Settings
-// By Default Ledger_Type is MCCF
-var ledgerType = "acl";
 
 /**
  * Adds or removes claims in the key release policy.
@@ -27,11 +25,16 @@ export const setKeyReleasePolicyClaims = (
 
   const logContext = new LogContext().appendScope("setKeyReleasePolicyClaimsEndpoint");
   const serviceRequest = new ServiceRequest<{ claimType: string; claims: Partial<AzureVMKeyReleasePolicyClaims> }>(logContext, request);
+    let appSettings: Settings = Settings.loadSettingsFromMap(settingsPolicyMap, logContext);
 
-  if (ledgerType.toLowerCase() !== "acl") {
-    throw new Error(`Unsupported Operation for LEDGER_TYPE: ${ledgerType}`);
-  }
-
+    console.log(appSettings.settings.service);
+    if (appSettings.settings.service.ledgerType !== "acl") {
+        return ServiceResult.Failed<string>(
+            { errorMessage: `Invalid Operation: for LedgerType:${appSettings.settings.service.ledgerType}` },
+            400,
+            logContext
+        );
+    }
   // Check if caller has a valid identity
   const [_, isValidIdentity] = serviceRequest.isAuthenticated();
   if (isValidIdentity.failure) return isValidIdentity;
@@ -69,10 +72,16 @@ export const removeKeyReleasePolicyClaims = (
   const logContext = new LogContext().appendScope("removeKeyReleasePolicyClaimsEndpoint");
   const serviceRequest = new ServiceRequest<{ claimType: string; claims: Partial<AzureVMKeyReleasePolicyClaims> }>(logContext, request);
 
-  if (ledgerType.toLowerCase() !== "acl") {
-    throw new Error(`Unsupported Operation for LEDGER_TYPE: ${ledgerType}`);
-  }
+  let appSettings: Settings = Settings.loadSettingsFromMap(settingsPolicyMap, logContext);
 
+  console.log(appSettings.settings.service);
+  if (appSettings.settings.service.ledgerType !== "acl") {
+      return ServiceResult.Failed<string>(
+          { errorMessage: `Invalid Operation: for LedgerType:${appSettings.settings.service.ledgerType}` },
+          400,
+          logContext
+      );
+  }
   // Check if caller has a valid identity
   const [_, isValidIdentity] = serviceRequest.isAuthenticated();
   if (isValidIdentity.failure) return isValidIdentity;

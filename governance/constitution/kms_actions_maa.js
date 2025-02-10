@@ -14,6 +14,7 @@ actions.set(
       checkType(args.settings_policy.service.description, "string");
       checkType(args.settings_policy.service.version, "string");
       checkType(args.settings_policy.service.debug, "boolean");
+      checkType(args.settings_policy.service.ledgerType, "string");
       console.log(`[INFO] [scope=set_settings_policy] Settings policy validation passed`);
     },
     function (args) {

@@ -16,7 +16,7 @@ settings-policy-set() {
                 "name": "azure-privacy-sandbox-kms",
                 "description": "Key Management Service",
                 "version": "1.0.0",
-                "debug": false
+                "debug": false,
             }
         }')
     fi

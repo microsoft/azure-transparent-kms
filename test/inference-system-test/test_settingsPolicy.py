@@ -1,4 +1,3 @@
-import os
 import pytest
 from utils import (
     apply_kms_constitution,
@@ -6,8 +5,6 @@ from utils import (
 )
 from endpoints import settingsPolicy
 
-LEDGER_TYPE = os.getenv("LEDGER_TYPE", "ACL").lower()
-@pytest.mark.skipif(LEDGER_TYPE == "acl", reason="ACL does not support Gov Settings Policy")
 def test_settingsPolicy_with_no_policy(setup_kms):
     status_code, settings_json = settingsPolicy()
     assert status_code == 200
@@ -21,14 +18,10 @@ def test_settingsPolicy_with_no_policy(setup_kms):
         }
     }
 
-LEDGER_TYPE = os.getenv("LEDGER_TYPE", "ACL").lower()
-@pytest.mark.skipif(LEDGER_TYPE == "acl", reason="ACL does not support Gov Settings Policy")
 def test_settingsPolicy_with_no_auth(setup_kms):
     status_code, settings_json = settingsPolicy(auth=None)
     assert status_code == 401
 
-LEDGER_TYPE = os.getenv("LEDGER_TYPE", "ACL").lower()
-@pytest.mark.skipif(LEDGER_TYPE == "acl", reason="ACL does not support Gov Settings Policy")
 def test_settingsPolicy_with_policy(setup_kms):
     apply_kms_constitution()
 
@@ -47,8 +40,6 @@ def test_settingsPolicy_with_policy(setup_kms):
     assert status_code == 200
     assert settings_json == policy
 
-LEDGER_TYPE = os.getenv("LEDGER_TYPE", "ACL").lower()
-@pytest.mark.skipif(LEDGER_TYPE == "acl", reason="ACL does not support Gov Settings Policy")
 def test_settingsPolicy_with_multiple_policy_sets(setup_kms):
     apply_kms_constitution()
 

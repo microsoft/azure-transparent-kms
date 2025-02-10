@@ -22,16 +22,16 @@ from endpoints import setSettingsPolicyApplicationEndpt, getSettingsPolicyApplic
 #     status_code, settings_json = setSettingsPolicyApplicationEndpt(auth=None)
 #     assert status_code == 401
 
-LEDGER_TYPE = os.getenv("LEDGER_TYPE", "MCCF").lower()
-@pytest.mark.skipif(LEDGER_TYPE == "mccf", reason="MCCF does not support JWT validation policy endpoint")
+@pytest.mark.parametrize("setup_kms", [{"overRideDefaultSettingsPolicy": True}], indirect=True)
 def test_settingsPolicy_with_policy(setup_kms):
 
     policy = {
         "service": {
             "name": "custom-kms",
             "description": "Custom Key Management Service",
-            "version": "2.0.0",
+            "version": "2.1.0",
             "debug": True,
+            "ledgerType": "acl",
         }
     }
 

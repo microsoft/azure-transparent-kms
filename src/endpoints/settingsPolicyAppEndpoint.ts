@@ -4,7 +4,7 @@
 import * as ccfapp from "@microsoft/ccf-app";
 import { ccf } from "@microsoft/ccf-app/global";
 import { IService, ISettings, Settings } from "../policies/Settings";
-import { settingsApplicationTableMapName, settingsPolicyApplicationTableMap } from "../repositories/Maps";
+import { settingsApplicationTableMapName, settingsPolicyApplicationTableMap, settingsPolicyMap } from "../repositories/Maps";
 import { LogContext } from "../utils/Logger";
 import { ServiceRequest } from "../utils/ServiceRequest";
 import { ServiceResult } from "../utils/ServiceResult";
@@ -13,7 +13,7 @@ import { enableEndpoint } from "../utils/Tooling";
 
 // Enable the endpoint
 enableEndpoint();
-// Override this by reading Default Settings
+// TODO: Override this by reading Default Settings
 // By Default Ledger_Type is MCCF
 var ledgerType = "acl";
 
@@ -30,6 +30,17 @@ export const setSettingsPolicy = (
 ): ServiceResult<string> => {
     const logContext = new LogContext().appendScope("setSettingsPolicyAppTableEndpoint");
     const serviceRequest = new ServiceRequest<{ settings_policy: IService }>(logContext, request);
+  
+    let appSettings: Settings = Settings.loadSettingsFromMap(settingsPolicyMap, logContext);
+
+    console.log(appSettings.settings.service);
+    if (appSettings.settings.service.ledgerType !== "acl") {
+        return ServiceResult.Failed<string>(
+            { errorMessage: `Invalid Operation: for LedgerType:${appSettings.settings.service.ledgerType}` },
+            400,
+            logContext
+        );
+    }
 
     // Check if caller has a valid identity
     const [_, isValidIdentity] = serviceRequest.isAuthenticated();
@@ -47,6 +58,7 @@ export const setSettingsPolicy = (
     const settings_policy: IService = body.settings_policy;
 
     try {
+      
         if (ledgerType.toLowerCase() !== "acl") {
           throw new Error(`Unsupported Operation for LEDGER_TYPE: ${ledgerType}`);
         }
@@ -74,6 +86,17 @@ export const getSettingsPolicy = (
 ): ServiceResult<string | ISettings> => {
   const logContext = new LogContext().appendScope("getSettingsPolicyAppTableEndpoint");
   const serviceRequest = new ServiceRequest<void>(logContext, request);
+  let appSettings: Settings = Settings.loadSettingsFromMap(settingsPolicyMap, logContext);
+
+  console.log(appSettings.settings.service);
+  if (appSettings.settings.service.ledgerType !== "acl") {
+      return ServiceResult.Failed<string>(
+          { errorMessage: `Invalid Operation: for LedgerType:${appSettings.settings.service.ledgerType}` },
+          400,
+          logContext
+      );
+  }
+
 
   // check if caller has a valid identity
   const [_, isValidIdentity] = serviceRequest.isAuthenticated();

@@ -1,9 +1,7 @@
-import os
 import pytest
 from endpoints import setKeyReleaseClaims
 
-LEDGER_TYPE = os.getenv("LEDGER_TYPE", "MCCF").lower()
-@pytest.mark.skipif(LEDGER_TYPE == "mccf", reason="MCCF does not support Key Release Claims policy set endpoint")
+@pytest.mark.parametrize("setup_kms", [True], indirect=True)
 def test_keyReleaseClaim_add_remove(setup_kms):
     # Add claims
     status_code, key_release_json = setKeyReleaseClaims(

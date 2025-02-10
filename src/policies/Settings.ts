@@ -51,6 +51,7 @@ export class Settings {
     Logger.debug(`Service Description: ${settings.service.description}`, Settings.logContext);
     Logger.debug(`Service Version: ${settings.service.version}`, Settings.logContext);
     Logger.debug(`Debug: ${settings.service.debug}`, Settings.logContext);
+    Logger.debug(`Debug: ${settings.service.ledgerType}`, Settings.logContext);
   }
 
   /**

@@ -2,8 +2,7 @@ import os
 import pytest
 from endpoints import setKeyRotationPolicy, getKeyRotationPolicy
 
-LEDGER_TYPE = os.getenv("LEDGER_TYPE", "MCCF").lower()
-@pytest.mark.skipif(LEDGER_TYPE == "mccf", reason="MCCF does not support set Key Rotation policy endpoint")
+@pytest.mark.parametrize("setup_kms", [{"overRideDefaultSettingsPolicy": True}], indirect=True)
 def test_set_keyRotationPolicy(setup_kms):
     # Add claims
     status_code, key_release_json = setKeyRotationPolicy(

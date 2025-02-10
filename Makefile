@@ -37,7 +37,7 @@ help: ## 💬 This help message :)
 
 build: ## 🔨 Build the Application
 	@echo -e "\e[34m$@\e[0m" || true;
-	LEDGER_TYPE=${LEDGER_TYPE} ./scripts/set_python_env.sh
+	./scripts/set_python_env.sh
 	npm install
 	npm run build
 
@@ -136,7 +136,7 @@ setup-mCCF: set-constitution-maa deploy propose-add-key-release-policy-maa propo
 # The following are here in case you forget to change directory!
 deploy: build ## 🚀 Deploy Managed CCF or local
 	@echo -e "\e[34m$@\e[0m" || true
-	LEDGER_TYPE=${LEDGER_TYPE} @CCF_PLATFORM=${CCF_PLATFORM} ./scripts/deploy.sh --network-url "${KMS_URL}"  --certificate_dir "${KEYS_DIR}"
+	@CCF_PLATFORM=${CCF_PLATFORM} ./scripts/deploy.sh --network-url "${KMS_URL}"  --certificate_dir "${KEYS_DIR}"
 
 lint: ## 🔍 Lint the code base (but don't fix)
 	@echo -e "\e[34m$@\e[0m" || true

@@ -16,6 +16,7 @@ def deploy_app_code():
 
 
 def apply_settings_policy(policy=None):
+    print("Applying custom settings policy {policy}")
     subprocess.run(
         "./scripts/kms/settings_policy_set.sh",
         env={

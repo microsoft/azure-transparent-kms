@@ -7,8 +7,7 @@ import { ServiceResult } from "../utils/ServiceResult";
 import { ServiceRequest } from "../utils/ServiceRequest";
 import { keyReleasePolicyMap } from "../repositories/Maps";
 import { LogContext } from "../utils/Logger";
-import { AzureVMKeyReleasePolicyClaims } from "../policies/AzureVMKeyReleasePolicyClaims";
-import { add, remove } from "../policies/KeyReleaseClaimsPolicy";
+import { add, KeyReleasePolicyClaims, remove } from "../policies/KeyReleaseClaimsPolicy";
 
 // Enable the endpoint
 enableEndpoint();
@@ -18,12 +17,13 @@ enableEndpoint();
  * @param request A CCF request containing the operation type and claims.
  * @returns A ServiceResult with the operation status.
  */
+
 export const setKeyReleasePolicyClaims = (
-  request: ccfapp.Request<{ claimType: string; claims: Partial<AzureVMKeyReleasePolicyClaims> }>, // Updated claims type
+  request: ccfapp.Request<{ claimType: "add" | "remove"; claims: Partial<KeyReleasePolicyClaims> }>, // Updated claims type
 ): ServiceResult<string> => {
 
   const logContext = new LogContext().appendScope("setKeyReleasePolicyClaimsEndpoint");
-  const serviceRequest = new ServiceRequest<{ claimType: string; claims: Partial<AzureVMKeyReleasePolicyClaims> }>(logContext, request);
+  const serviceRequest = new ServiceRequest<{ claimType: string; claims: Partial<KeyReleasePolicyClaims> }>(logContext, request);
 
   // Check if caller has a valid identity
   const [_, isValidIdentity] = serviceRequest.isAuthenticated();
@@ -56,11 +56,11 @@ export const setKeyReleasePolicyClaims = (
  * @returns A ServiceResult with the operation status.
  */
 export const removeKeyReleasePolicyClaims = (
-  request: ccfapp.Request<{ claimType: string; claims: Partial<AzureVMKeyReleasePolicyClaims> }>, // Updated claims type
+  request: ccfapp.Request<{ claimType: string; claims: Partial<KeyReleasePolicyClaims> }>, // Updated claims type
 ): ServiceResult<string> => {
 
   const logContext = new LogContext().appendScope("removeKeyReleasePolicyClaimsEndpoint");
-  const serviceRequest = new ServiceRequest<{ claimType: string; claims: Partial<AzureVMKeyReleasePolicyClaims> }>(logContext, request);
+  const serviceRequest = new ServiceRequest<{ claimType: string; claims: Partial<KeyReleasePolicyClaims> }>(logContext, request);
 
   // Check if caller has a valid identity
   const [_, isValidIdentity] = serviceRequest.isAuthenticated();
@@ -78,7 +78,7 @@ export const removeKeyReleasePolicyClaims = (
   const { claimType, claims } = body;
 
   // Validate claims: Ensure all keys exist in IKeyReleaseClaims
-  const validKeys = new Set(Object.keys({} as AzureVMKeyReleasePolicyClaims));
+  const validKeys = new Set(Object.keys({} as KeyReleasePolicyClaims));
   const invalidKeys = Object.keys(claims).filter(key => !validKeys.has(key));
 
   if (invalidKeys.length > 0) {

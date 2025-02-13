@@ -17,7 +17,7 @@ enableEndpoint();
 const key = "settings_policy";
 const keyBuf = ccf.strToBuf(key);
 
-const settingsPolicyMapName = "public:settings_policy";
+// const settingsPolicyMapName = "public:settings_policy";
 
 /**
  * Endpoint to set the Settings Policy.
@@ -25,17 +25,17 @@ const settingsPolicyMapName = "public:settings_policy";
  * @returns A ServiceResult indicating success or failure.
  */
 export const setSettingsPolicy = (
-    request: ccfapp.Request<{ set_settings_policy: IService }>,
+    request: ccfapp.Request<{ settings_policy: IService }>,
 ): ServiceResult<string> => {
     const logContext = new LogContext().appendScope("setSettingsPolicyEndpoint");
-    const serviceRequest = new ServiceRequest<{ set_settings_policy: IService }>(logContext, request);
+    const serviceRequest = new ServiceRequest<{ settings_policy: IService }>(logContext, request);
 
     // Check if caller has a valid identity
     const [_, isValidIdentity] = serviceRequest.isAuthenticated();
     if (isValidIdentity.failure) return isValidIdentity;
 
     const { body } = serviceRequest;
-    if (!body || !body.set_settings_policy) {
+    if (!body || !body.settings_policy) {
         return ServiceResult.Failed<string>(
             { errorMessage: "Invalid request body: 'set_settings_policy' is required." },
             400,
@@ -43,13 +43,13 @@ export const setSettingsPolicy = (
         );
     }
 
-    const settings_policy: IService = body.set_settings_policy;
+    const settings_policy: IService = body.settings_policy;
 
     try {
         // Validate and apply the policy
         const jsonItems = JSON.stringify(settings_policy);
         const jsonItemsBuf = ccf.strToBuf(jsonItems);
-        ccf.kv[settingsPolicyMapName].set(keyBuf, jsonItemsBuf);
+        ccf.kv[settingsMapName].set(keyBuf, jsonItemsBuf);
         console.log(
           `[INFO] [scope=set_settings_policy] Settings policy ${jsonItems} saved in ${settingsMapName}`,
         );
@@ -67,7 +67,7 @@ export const setSettingsPolicy = (
 export const settingsPolicy = (
   request: ccfapp.Request<void>
 ): ServiceResult<string | ISettings> => {
-  const logContext = new LogContext().appendScope("settingsPolicyEndpoint");
+  const logContext = new LogContext().appendScope("getSettingsPolicyEndpoint");
   const serviceRequest = new ServiceRequest<void>(logContext, request);
 
   // check if caller has a valid identity

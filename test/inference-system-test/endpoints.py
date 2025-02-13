@@ -54,7 +54,7 @@ def keyReleasePolicy(**kwargs):
 
 
 def settingsPolicy(**kwargs):
-    return call_endpoint("settingsPolicy", action="get", **kwargs)
+    return call_endpoint("settings_policy", action="get", **kwargs)
 
 
 def setSettingsPolicy(settings_policy: dict):
@@ -67,7 +67,6 @@ def setSettingsPolicy(settings_policy: dict):
     return call_endpoint(
         "settings_policy", action="set", policy=set_settings_policy_json
     )
-
 
 def auth(**kwargs):
     return call_endpoint("auth", **kwargs)

@@ -17,7 +17,7 @@ export const keyReleasePolicyMap = new KeyReleaseClaimsPolicyStore(keyReleaseMap
 export const settingsMapName = "public:kms.policies.settings";
 export const settingsPolicyMap = ccf.kv[settingsMapName];
 export const keyRotationSetName = "public:kms.policies.key_rotation";
-export const keyRotationPolicySet = new KeyRotationPolicyStore(keyRotationSetName);
+export const keyRotationPolicyMap = new KeyRotationPolicyStore(keyRotationSetName);
 export const jwtValidationPolicyMapName = "public:kms.policies.jwt_validation";
 export const jwtValidationPolicyMap = new JwtValidationPolicyStore(jwtValidationPolicyMapName);
 //#endregion

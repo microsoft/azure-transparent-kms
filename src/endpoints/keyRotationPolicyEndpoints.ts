@@ -5,7 +5,7 @@ import * as ccfapp from "@microsoft/ccf-app";
 import { enableEndpoint } from "../utils/Tooling";
 import { ServiceResult } from "../utils/ServiceResult";
 import { ServiceRequest } from "../utils/ServiceRequest";
-import { keyRotationPolicySet } from "../repositories/Maps";
+import { keyRotationPolicyMap } from "../repositories/Maps";
 import { LogContext } from "../utils/Logger";
 import { IKeyRotationPolicy } from "../policies/IKeyRotationPolicy";
 import { applyKeyRotationPolicy, getKeyRotationPolicyFromMap, validateKeyRotationPolicy } from "../policies/KeyRotationPolicy";
@@ -42,7 +42,7 @@ export const setKeyRotationPolicy = (
     try {
         // Validate and apply the policy
         validateKeyRotationPolicy(keyRotationPolicy);
-        applyKeyRotationPolicy(keyRotationPolicySet, keyRotationPolicy);
+        applyKeyRotationPolicy(keyRotationPolicyMap, keyRotationPolicy);
 
         return ServiceResult.Succeeded<string>("Key rotation policy set successfully.", logContext);
     } catch (error: any) {
@@ -65,7 +65,7 @@ export const getKeyRotationPolicy = (
     if (isValidIdentity.failure) return isValidIdentity;
 
     try {
-        const policy = getKeyRotationPolicyFromMap(keyRotationPolicySet);
+        const policy = getKeyRotationPolicyFromMap(keyRotationPolicyMap);
 
         if (!policy) {
             return ServiceResult.Failed<string>({ errorMessage: "Key rotation policy not found." }, 400, logContext);

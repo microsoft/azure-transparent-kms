@@ -7,6 +7,7 @@ def test_keyReleaseClaim_add_remove(setup_kms, set_exclude_app_table_env):
         type="add", claims={"x-ms-attestation-type": "test-value"}
     )
     assert status_code == 200
+    # Remove Claims
     status_code, key_release_json = setKeyReleaseClaims(
         type="remove", claims={"x-ms-attestation-type": "test-value"}
     )

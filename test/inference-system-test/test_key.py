@@ -2,7 +2,8 @@ import pytest
 from endpoints import key, refresh
 from utils import apply_kms_constitution, apply_key_release_policy, trust_jwt_issuer, get_test_attestation, get_test_wrapping_key
 
-
+# Disabling this test as this test uses Governance actions
+@pytest.disable()
 @pytest.mark.xfail(strict=True)
 def test_no_keys(setup_kms):
     apply_kms_constitution()
@@ -13,6 +14,8 @@ def test_no_keys(setup_kms):
             break
     assert status_code == 404
 
+# Disabling this test as this test uses Governance actions
+@pytest.disable()
 def test_no_jwt_policy(setup_kms):
     apply_kms_constitution()
     refresh()

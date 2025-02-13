@@ -4,20 +4,26 @@ from endpoints import keyReleasePolicy
 
 # TODO: Assert what we would expect the key release policy to be for all tests
 
-
+# Disabling this test as this test uses Governance actions
+# This has been replaced by test_keyReleaseClaimsPolicy test instead
+@pytest.disable()
 @pytest.mark.xfail(strict=True) # TODO: Fix #175
 def test_keyReleasePolicy_with_no_policy(setup_kms):
     status_code, key_release_json = keyReleasePolicy()
     assert status_code == 200
 
-
+# Disabling this test as this test uses Governance actions
+# This has been replaced by test_keyReleaseClaimsPolicy test instead
+@pytest.disable()
 def test_keyReleasePolicy_with_policy_added(setup_kms):
     apply_kms_constitution()
     apply_key_release_policy()
     status_code, key_release_json = keyReleasePolicy()
     assert status_code == 200
 
-
+# Disabling this test as this test uses Governance actions
+# This has been replaced by test_keyReleaseClaimsPolicy test instead
+@pytest.disable()
 def test_keyReleasePolicy_with_policy_added_then_removed(setup_kms):
     apply_kms_constitution()
     apply_key_release_policy()

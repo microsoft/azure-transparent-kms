@@ -61,16 +61,37 @@ def remove_key_release_policy():
         check=True,
     )
 
+def trust_jwt_issuer_prop():
+    subprocess.run(
+        [
+            "scripts/kms/jwt_issuer_trust.sh",
+            "governance/proposals/set_jwt_issuer.json",
+        ],
+        cwd=REPO_ROOT,
+        check=True,
+    )
+    
 
 def trust_jwt_issuer(iss=""):
     command = ["scripts/kms/jwt_issuer_trust.sh"]
     if iss:
         command.extend(["--iss", iss])  # Pass '--iss' and 'iss' as separate arguments
-    subprocess.run(
-        command,
-        cwd=REPO_ROOT,
-        check=True,
-    )
+
+    try:
+        result = subprocess.run(
+            command,
+            cwd=REPO_ROOT,
+            check=True,
+            capture_output=True,  # Capture stdout & stderr
+            text=True  # Ensure output is readable as a string
+        )
+        print("✅ Command executed successfully:", result.stdout)
+    except subprocess.CalledProcessError as e:
+        print("❌ Command failed!")
+        print(f"🔹 Exit Code: {e.returncode}")
+        print(f"🔹 STDOUT: {e.stdout}")
+        print(f"🔹 STDERR: {e.stderr}")
+        raise  # Re-raise the error after logging details
     
 
 def get_test_attestation():

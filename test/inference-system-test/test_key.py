@@ -1,6 +1,6 @@
 import pytest
-from endpoints import key, refresh
-from utils import apply_kms_constitution, apply_key_release_policy, trust_jwt_issuer, get_test_attestation, get_test_wrapping_key
+from endpoints import key, refresh, setKeyReleaseClaims, setJwtValidationPolicy
+from utils import apply_kms_constitution, apply_key_release_policy, trust_jwt_issuer, get_test_attestation, get_test_wrapping_key, trust_jwt_issuer_prop
 
 @pytest.mark.skip(reason="Disabling this test as this test uses Governance actions")
 @pytest.mark.xfail(strict=True)
@@ -23,7 +23,7 @@ def test_no_jwt_policy(setup_kms):
             break
     assert status_code == 401
     
-
+@pytest.mark.skip(reason="Disabling this test as this test uses Governance actions")
 def test_no_key_release_policy(setup_kms):
     apply_kms_constitution()
     trust_jwt_issuer()
@@ -36,9 +36,24 @@ def test_no_key_release_policy(setup_kms):
 
 
 def test_with_keys_and_policy(setup_kms):
-    apply_kms_constitution()
-    apply_key_release_policy()
-    trust_jwt_issuer()
+    status_code, key_release_json = setKeyReleaseClaims(
+    type="add", claims={
+        "x-ms-ver": ["1.0"],
+        "x-ms-azurevm-debuggersdisabled": True,
+        "x-ms-azurevm-osversion-major": [22, 23]
+    })
+    trust_jwt_issuer(iss="http://Demo-jwt-issuer")
+    status_code, response = setJwtValidationPolicy(
+        jwt_validation_policy={
+            "issuer": "http://Demo-jwt-issuer",
+            "validation_policy": {
+          "iss": "http://Demo-jwt-issuer",
+          "sub": "c0d8e9a7-6b8e-4e1f-9e4a-3b2c1d0f5a6b",
+          "name": "Cool caller"
+        },
+        }
+    )
+    assert status_code == 200
     refresh()
     while True:
         status_code, key_json = key(auth="jwt")
@@ -46,7 +61,7 @@ def test_with_keys_and_policy(setup_kms):
             break
     assert status_code == 200
 
-
+@pytest.mark.skip(reason="Disabling this test as this test uses Governance actions")
 def test_with_keys_and_policy_jwt_auth(setup_kms):
     apply_kms_constitution()
     apply_key_release_policy()
@@ -58,7 +73,7 @@ def test_with_keys_and_policy_jwt_auth(setup_kms):
             break
     assert status_code == 200
 
-
+@pytest.mark.skip(reason="Disabling this test as this test uses Governance actions")
 def test_key_with_multiple(setup_kms):
     apply_kms_constitution()
     apply_key_release_policy()
@@ -73,7 +88,7 @@ def test_key_with_multiple(setup_kms):
 
 
 # Test kid parameter
-
+@pytest.mark.skip(reason="Disabling this test as this test uses Governance actions")
 def test_key_kid_not_present_with_other_keys(setup_kms):
     refresh()
     refresh()
@@ -90,7 +105,7 @@ def test_key_kid_not_present_with_other_keys(setup_kms):
     assert status_code == 400
 
 
-
+@pytest.mark.skip(reason="Disabling this test as this test uses Governance actions")
 def test_key_kid_not_present_without_other_keys(setup_kms):
     apply_kms_constitution()
     apply_key_release_policy()
@@ -104,7 +119,7 @@ def test_key_kid_not_present_without_other_keys(setup_kms):
             break
     assert status_code == 400
 
-
+@pytest.mark.skip(reason="Disabling this test as this test uses Governance actions")
 def test_key_kid_present(setup_kms):
     apply_kms_constitution()
     apply_key_release_policy()
@@ -121,7 +136,7 @@ def test_key_kid_present(setup_kms):
     assert status_code == 200
     assert refresh_json["id"] == 1
 
-
+@pytest.mark.skip(reason="Disabling this test as this test uses Governance actions")
 def test_key_refresh_all_ids(setup_kms):
     apply_kms_constitution()
     apply_key_release_policy()

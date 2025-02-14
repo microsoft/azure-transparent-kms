@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 import { IKeyReleasePolicySnpProps } from "..";
+import { IKeyReleasePolicyClaims } from "./KeyReleaseClaimsPolicy";
 
 export enum KeyReleasePolicyType {
   ADD = "add",
@@ -12,5 +13,5 @@ export interface IKeyReleasePolicy {
   type: KeyReleasePolicyType;
   gt?: IKeyReleasePolicySnpProps;
   gte?: IKeyReleasePolicySnpProps;
-  claims: IKeyReleasePolicySnpProps;
+  claims: IKeyReleasePolicyClaims;
 }

@@ -260,7 +260,7 @@
     },
     "/setKeyReleasePolicyClaims": {
       "post": {
-        "js_module": "endpoints/setKeyReleasePolicyClaimsEndpoint.js",
+        "js_module": "endpoints/keyReleasePolicyEndpoint.js",
         "js_function": "setKeyReleasePolicyClaims",
         "forwarding_required": "always",
         "authn_policies": [

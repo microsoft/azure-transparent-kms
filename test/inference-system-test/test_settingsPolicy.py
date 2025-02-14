@@ -11,7 +11,6 @@ def test_settingsPolicy_with_policy(setup_kms):
             "description": "Custom Key Management Service",
             "version": "2.1.0",
             "debug": True,
-            "ledgerType": "acl",
         }
     }
 

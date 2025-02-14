@@ -15,4 +15,3 @@ export * from "./utils/Tooling";
 export * from "./utils/ServiceResult";
 export * from "./endpoints/jwtValidationPolicyEndpoint"
 export * from "./endpoints/keyRotationPolicyEndpoints"
-export * from "./endpoints/setKeyReleasePolicyClaimsEndpoint"

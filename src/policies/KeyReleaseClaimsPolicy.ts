@@ -5,12 +5,12 @@ import { IMaaAttestationReport } from "../attestation/IMaaAttestationReport";
 import { IAttestationReport } from "../attestation/ISnpAttestationReport";
 import { KeyReleaseClaimsPolicyStore } from "../repositories/KeyReleaseClaimsPolicyStore";
 
-export type KeyReleasePolicyClaims = Partial<IAttestationReport> & Partial<IMaaAttestationReport>;
+export type IKeyReleasePolicyClaims = Partial<IAttestationReport> & Partial<IMaaAttestationReport>;
 
 export const add = (
   map: KeyReleaseClaimsPolicyStore,
   claimType: string,
-  claims: KeyReleasePolicyClaims
+  claims: IKeyReleasePolicyClaims
 ): void => {
   console.log(`Add claims from key release policy: ${JSON.stringify(claims)}`);
   map.storeClaims(claimType, claims);
@@ -20,8 +20,8 @@ export const add = (
 export const remove = (
   map: KeyReleaseClaimsPolicyStore,
   claimType: string,
-  claims: KeyReleasePolicyClaims
+  claims: IKeyReleasePolicyClaims
 ): void => {
   console.log(`Remove claims from key release policy : ${JSON.stringify(claims)}`);
-  map.removeClaims(claimType, claims);
+  map.removeIndividualClaims(claimType, claims);
 };

@@ -13,7 +13,7 @@ import { KmsError } from "../utils/KmsError";
 export class KeyReleasePolicy implements IKeyReleasePolicy {
   public type = KeyReleasePolicyType.ADD;
   public claims = {
-    "x-ms-attestation-type": ["snp"],
+    "x-ms-attestation-type": "snp",
   };
   //This helper method flattens the object to a single level
   private static flattenObject(obj: Record<string, any>): Record<string, any> {

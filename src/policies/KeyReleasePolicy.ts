@@ -11,6 +11,7 @@ import { IAttestationReport } from "../attestation/ISnpAttestationReport";
 import { KmsError } from "../utils/KmsError";
 import { IMaaAttestationReport } from "../attestation/IMaaAttestationReport";
 import { IMaaKeyReleasePolicyClaims } from "./IMaaKeyReleasePolicyClaims";
+import { IKeyReleasePolicyClaims } from "./KeyReleaseClaimsPolicy";
 
 export class KeyReleasePolicy implements IKeyReleasePolicy {
   public type = KeyReleasePolicyType.ADD;
@@ -34,6 +35,8 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
     console.log(`Flattened object: ${JSON.stringify(res)}`);
     return res;
   }
+
+  // TODO: @yf23 to make this method a templatized method to override KeyReleasePolicyClaims and attestation Claims
   private static validateKeyReleasePolicyClaims(
     keyReleasePolicyClaims: IKeyReleasePolicySnpProps,
     attestationClaims: IAttestationReport,
@@ -93,6 +96,8 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
     return ServiceResult.Succeeded<IAttestationReport>(attestationClaims, logContext);
   }
 
+  // TODO: @yf23 once the method above is templatized this method can be removed
+  // This method is currently used in MaaValidation right now 
   private static validateMaaKeyReleasePolicyClaims(
     keyReleasePolicyClaims: IMaaKeyReleasePolicyClaims,
     attestationClaims: IMaaAttestationReport,
@@ -116,8 +121,6 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
       );
     }
 
-    console.log(`Iterating over keys in validateMaaKeyReleasePolicyClaims: ${JSON.stringify(keyReleasePolicyClaims)}`);
-
     try {
 
       for (let inx = 0; inx < Object.keys(keyReleasePolicyClaims).length; inx++) {
@@ -126,7 +129,6 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
         // check if key is in attestation
         const attestationValue = attestationClaims[key];
         const policyValue = keyReleasePolicyClaims[key];
-        console.log(`attestationValue: ${attestationValue}, policyValue: ${policyValue}`);
         const isUndefined = typeof attestationValue === "undefined";
         Logger.debug(
           `Checking key ${key}, typeof attestationValue: ${typeof attestationValue}, isUndefined: ${isUndefined}, attestation value: ${attestationValue}, policyValue: ${policyValue}`,
@@ -169,6 +171,7 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
     }
   }
 
+  // TODO: @yf23 to make this method a templatized method to override KeyReleasePolicyClaims and attestation Claims
   private static validateKeyReleasePolicyOperators(
     type: string,
     keyReleasePolicyClaims: IKeyReleasePolicySnpProps,
@@ -286,14 +289,13 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
     return ServiceResult.Succeeded<IAttestationReport>(attestationClaims, logContext);
   }
 
+  
   public static validateKeyReleasePolicy(
     keyReleasePolicy: IKeyReleasePolicy,
-    attestationClaims: IMaaAttestationReport,
+    attestationClaims: IKeyReleasePolicyClaims,
     logContextIn?: LogContext,
-  ): ServiceResult<string | IMaaAttestationReport> {
+  ): ServiceResult<string | IKeyReleasePolicyClaims> {
     const logContext = (logContextIn?.clone() || new LogContext()).appendScope("validateKeyReleasePolicy");
-    console.log(`Validating key release policy: ${JSON.stringify(keyReleasePolicy)}`, logContext);
-    console.log(`Validating attestation claims: ${JSON.stringify(attestationClaims)}`, logContext);
     // claims are mandatory
     if (Object.keys(keyReleasePolicy.claims).length === 0) {
       return ServiceResult.Failed<string>(
@@ -310,10 +312,11 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
     console.log(`Flattened attestation claims: ${JSON.stringify(attestationClaims)}`, logContext);
 
     // Check claims
+    // @yf23 substitute with templatized method later
     let policyValidationResult =
       KeyReleasePolicy.validateMaaKeyReleasePolicyClaims(
         keyReleasePolicy.claims,
-        attestationClaims,
+        attestationClaims as IMaaAttestationReport,
         logContext
       );
     if (!policyValidationResult.success) {
@@ -327,7 +330,7 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
         KeyReleasePolicy.validateKeyReleasePolicyOperators(
           "gte",
           keyReleasePolicy.gte,
-          attestationClaims,
+          attestationClaims as IAttestationReport,
           logContext
         );
     }
@@ -341,7 +344,7 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
         KeyReleasePolicy.validateKeyReleasePolicyOperators(
           "gt",
           keyReleasePolicy.gt,
-          attestationClaims,
+          attestationClaims as IAttestationReport,
           logContext
         );
     }

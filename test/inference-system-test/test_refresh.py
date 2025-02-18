@@ -1,12 +1,12 @@
 from endpoints import refresh
 
 
-def test_single_refresh(setup_kms):
+def test_single_refresh(setup_Default_JWT_ReleaseClaims_Policy):
     status_code, refresh_json = refresh()
     assert status_code == 200
 
 
-def test_multiple_refresh(setup_kms):
+def test_multiple_refresh(setup_Default_JWT_ReleaseClaims_Policy):
     status_code, refresh_json = refresh()
     assert status_code == 200
     first_kid = refresh_json["kid"]

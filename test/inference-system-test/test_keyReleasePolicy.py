@@ -1,7 +1,7 @@
 import pytest
 from endpoints import setKeyReleaseClaims, keyReleasePolicy
 
-def test_keyReleaseClaim_add_remove(setup_kms, set_exclude_app_table_env):
+def test_keyReleaseClaim_add_remove(setup_kms):
     # Add claims by calling SetKeyRelease Endpoints
     status_code, key_release_json = setKeyReleaseClaims(
         type="add", claims={

@@ -20,7 +20,7 @@ enableEndpoint();
  * @param request A CCF request containing the operation type and claims.
  * @returns A ServiceResult with the operation status.
  */
-// @yf23 to update this to use IKeyReleasePolicy interface
+// @yf23 to update this to extend this to support Operators gte, gt and in clauses
 export const setKeyReleasePolicyClaims = (
   request: ccfapp.Request<{ claimType: "add" | "remove"; claims: Partial<IKeyReleasePolicyClaims> }>, // Updated claims type
 ): ServiceResult<string> => {
@@ -58,7 +58,7 @@ export const setKeyReleasePolicyClaims = (
  * @param request A CCF request containing the operation type and claims.
  * @returns A ServiceResult with the operation status.
  */
-// @yf23 to update this to use IKeyReleasePolicy interface
+// @yf23 to update this to extend this to support Operators gte, gt and in clauses
 export const removeKeyReleasePolicyClaims = (
   request: ccfapp.Request<{ claimType: string; claims: Partial<IKeyReleasePolicyClaims> }>, // Updated claims type
 ): ServiceResult<string> => {

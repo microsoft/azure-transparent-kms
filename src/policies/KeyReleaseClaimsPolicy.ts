@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-
+// @yf23: This file should be merged with KeyReleasePolicy.ts to have a single file for adding/removing claims and policies
 import { KeyReleaseClaimsPolicyStore } from "../repositories/KeyReleaseClaimsPolicyStore";
 import { IMaaKeyReleasePolicyClaims } from "./IMaaKeyReleasePolicyClaims";
 import { IKeyReleasePolicySnpProps } from "./IKeyReleasePolicySnpProps";

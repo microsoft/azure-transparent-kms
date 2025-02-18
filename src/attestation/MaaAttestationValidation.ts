@@ -16,6 +16,7 @@ export class MaaAttestationValidation {
     this.logContext = (logContext?.clone() || new LogContext()).appendScope("MaaAttestationValidation");
   }
 
+  // @yf23: This should be templatized as well to return the appropriate type 
   public validateAttestation(): ServiceResult<string | IMaaAttestationReport> {
     let errorMessage = "";
     if (!this.jwtIdentity) {
@@ -33,7 +34,6 @@ export class MaaAttestationValidation {
     // Get the key release policy
     const keyReleasePolicy =
       KeyReleasePolicy.getKeyReleasePolicyFromMap(ccf.kv[keyReleaseMapName], this.logContext);
-    console.log(`Key release policy: ${JSON.stringify(keyReleasePolicy)}`, this.logContext);
     Logger.debug(
       `Key release policy: ${JSON.stringify(
         keyReleasePolicy,
@@ -46,6 +46,7 @@ export class MaaAttestationValidation {
       attestation,
       this.logContext
     );
-    return policyValidationResult;
+    
+    return policyValidationResult as ServiceResult<string | IMaaAttestationReport>;
   }
 }

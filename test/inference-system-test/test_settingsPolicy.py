@@ -19,6 +19,10 @@ def test_settingsPolicy_with_policy(setup_kms):
 
     status_code, settings_json = settingsPolicy()
     assert status_code == 200
+    assert settings_json["service"]["name"] == "custom-kms"
+    assert settings_json["service"]["description"] == "Custom Key Management Service"
+    assert settings_json["service"]["version"] == "2.1.0"
+    assert settings_json["service"]["debug"] == True
 
 if __name__ == "__main__":
     import pytest

@@ -36,6 +36,9 @@ export class JwtValidator implements IValidatorService {
     * */
   validate(request: ccfapp.Request<any>): ServiceResult<string> {
     const jwtCaller = request.caller as unknown as ccfapp.JwtAuthnIdentity;
+    console.log(`JWT caller JWT Caller: ${JSON.stringify(jwtCaller)}`, this.logContext);
+    console.log(`JWT caller JWT: ${JSON.stringify(jwtCaller.jwt)}`, this.logContext);
+    console.log(`JWT caller Key Issuer: ${JSON.stringify(jwtCaller.jwt.keyIssuer)}`, this.logContext);
     Logger.debug(
       `Authorization: JWT jwtCaller (JwtValidator)-> ${<JwtIdentityProviderEnum>jwtCaller.jwt.keyIssuer}`,
       this.logContext

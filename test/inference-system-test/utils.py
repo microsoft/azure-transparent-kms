@@ -85,12 +85,8 @@ def trust_jwt_issuer(iss=""):
             capture_output=True,  # Capture stdout & stderr
             text=True  # Ensure output is readable as a string
         )
-        print("✅ Command executed successfully:", result.stdout)
     except subprocess.CalledProcessError as e:
-        print("❌ Command failed!")
-        print(f"🔹 Exit Code: {e.returncode}")
-        print(f"🔹 STDOUT: {e.stdout}")
-        print(f"🔹 STDERR: {e.stderr}")
+        print("Command failed!")
         raise  # Re-raise the error after logging details
     
 

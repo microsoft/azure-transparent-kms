@@ -33,6 +33,7 @@ export class MaaAttestationValidation {
     // Get the key release policy
     const keyReleasePolicy =
       KeyReleasePolicy.getKeyReleasePolicyFromMap(ccf.kv[keyReleaseMapName], this.logContext);
+    console.log(`Key release policy: ${JSON.stringify(keyReleasePolicy)}`, this.logContext);
     Logger.debug(
       `Key release policy: ${JSON.stringify(
         keyReleasePolicy,

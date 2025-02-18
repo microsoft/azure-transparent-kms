@@ -9,6 +9,8 @@ import { Logger, LogContext } from "../utils/Logger";
 import { ServiceResult } from "../utils/ServiceResult";
 import { IAttestationReport } from "../attestation/ISnpAttestationReport";
 import { KmsError } from "../utils/KmsError";
+import { IMaaAttestationReport } from "../attestation/IMaaAttestationReport";
+import { IMaaKeyReleasePolicyClaims } from "./IMaaKeyReleasePolicyClaims";
 
 export class KeyReleasePolicy implements IKeyReleasePolicy {
   public type = KeyReleasePolicyType.ADD;
@@ -17,17 +19,19 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
   };
   //This helper method flattens the object to a single level
   private static flattenObject(obj: Record<string, any>): Record<string, any> {
+    console.log(`Flattening object: ${JSON.stringify(obj)}`);
     const res: Record<string, any> = {};
     for (const k in obj) {
-        if (typeof obj[k] === "object" && obj[k] !== null) {
-            const sub = KeyReleasePolicy.flattenObject(obj[k]);
-            for (const j in sub) {
-                res[`${k}.${j}`] = sub[j];
-            }
-        } else {
-            res[k] = obj[k];
+      if (typeof obj[k] === "object" && obj[k] !== null) {
+        const sub = KeyReleasePolicy.flattenObject(obj[k]);
+        for (const j in sub) {
+          res[`${k}.${j}`] = sub[j];
         }
+      } else {
+        res[k] = obj[k];
+      }
     }
+    console.log(`Flattened object: ${JSON.stringify(res)}`);
     return res;
   }
   private static validateKeyReleasePolicyClaims(
@@ -87,6 +91,82 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
       }
     }
     return ServiceResult.Succeeded<IAttestationReport>(attestationClaims, logContext);
+  }
+
+  private static validateMaaKeyReleasePolicyClaims(
+    keyReleasePolicyClaims: IMaaKeyReleasePolicyClaims,
+    attestationClaims: IMaaAttestationReport,
+    logContext: LogContext,
+  ): ServiceResult<string | IMaaAttestationReport> {
+    if (
+      keyReleasePolicyClaims === null ||
+      keyReleasePolicyClaims === undefined
+    ) {
+      return ServiceResult.Failed<string>(
+        { errorMessage: "Missing key release policy" },
+        500,
+        logContext,
+      );
+    }
+    if (attestationClaims === null || attestationClaims === undefined) {
+      return ServiceResult.Failed<string>(
+        { errorMessage: "Missing attestation claims" },
+        500,
+        logContext,
+      );
+    }
+
+    console.log(`Iterating over keys in validateMaaKeyReleasePolicyClaims: ${JSON.stringify(keyReleasePolicyClaims)}`);
+
+    try {
+
+      for (let inx = 0; inx < Object.keys(keyReleasePolicyClaims).length; inx++) {
+        const key = Object.keys(keyReleasePolicyClaims)[inx];
+
+        // check if key is in attestation
+        const attestationValue = attestationClaims[key];
+        const policyValue = keyReleasePolicyClaims[key];
+        console.log(`attestationValue: ${attestationValue}, policyValue: ${policyValue}`);
+        const isUndefined = typeof attestationValue === "undefined";
+        Logger.debug(
+          `Checking key ${key}, typeof attestationValue: ${typeof attestationValue}, isUndefined: ${isUndefined}, attestation value: ${attestationValue}, policyValue: ${policyValue}`,
+          logContext
+        );
+        if (isUndefined) {
+          return ServiceResult.Failed<string>(
+            { errorMessage: `Missing claim in attestation: ${key}` },
+            400,
+            logContext,
+          );
+        }
+
+        // Normalize values to arrays to avoid TypeErrors when calling array methods.
+        // This ensures both policyValue and attestationValue can be safely compared, 
+        // regardless of whether they were originally arrays or single values.
+        // Using `.some()` instead of `.filter()` improves efficiency by stopping early 
+        // when a match is found, preventing unnecessary array creation and iteration.
+        const policyValues = Array.isArray(policyValue) ? policyValue : [policyValue];
+        const attestationValues = Array.isArray(attestationValue) ? attestationValue : [attestationValue];
+
+        // Check if attestationValue exists in policyValues
+        if (!policyValues.some((p) => p?.toString() === attestationValues[0]?.toString())) {
+          return ServiceResult.Failed<string>(
+            {
+              errorMessage: `Attestation claim ${key}, value ${attestationValue} does not match policy values: ${JSON.stringify(policyValues)}`,
+            },
+            400,
+            logContext,
+          );
+        }
+      }
+      return ServiceResult.Succeeded<IMaaAttestationReport>(attestationClaims, logContext);
+    } catch (error) {
+      return ServiceResult.Failed<string>(
+        { errorMessage: `Failed to validate key release policy claims: ${error}` },
+        500,
+        logContext,
+      );
+    }
   }
 
   private static validateKeyReleasePolicyOperators(
@@ -208,10 +288,12 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
 
   public static validateKeyReleasePolicy(
     keyReleasePolicy: IKeyReleasePolicy,
-    attestationClaims: IAttestationReport,
+    attestationClaims: IMaaAttestationReport,
     logContextIn?: LogContext,
-  ): ServiceResult<string | IAttestationReport> {
+  ): ServiceResult<string | IMaaAttestationReport> {
     const logContext = (logContextIn?.clone() || new LogContext()).appendScope("validateKeyReleasePolicy");
+    console.log(`Validating key release policy: ${JSON.stringify(keyReleasePolicy)}`, logContext);
+    console.log(`Validating attestation claims: ${JSON.stringify(attestationClaims)}`, logContext);
     // claims are mandatory
     if (Object.keys(keyReleasePolicy.claims).length === 0) {
       return ServiceResult.Failed<string>(
@@ -224,11 +306,12 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
       );
     }
     // Flatten the attestationClaims
-    attestationClaims= KeyReleasePolicy.flattenObject(attestationClaims);
+    attestationClaims = KeyReleasePolicy.flattenObject(attestationClaims);
+    console.log(`Flattened attestation claims: ${JSON.stringify(attestationClaims)}`, logContext);
 
     // Check claims
     let policyValidationResult =
-      KeyReleasePolicy.validateKeyReleasePolicyClaims(
+      KeyReleasePolicy.validateMaaKeyReleasePolicyClaims(
         keyReleasePolicy.claims,
         attestationClaims,
         logContext
@@ -289,10 +372,11 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
       const kvKey = kv.kvkey;
       const kvKeyBuf = ccf.strToBuf(kvKey);
       const kvValueBuf = keyReleasePolicyMap.get(kvKeyBuf);
-      Logger.debug(`Retrieved key release policy ${kvKey} from map: `, logContext, kvValueBuf ? ccf.bufToStr(kvValueBuf): "undefined");
+      Logger.debug(`Retrieved key release policy ${kvKey} from map: `, logContext, kvValueBuf ? ccf.bufToStr(kvValueBuf) : "undefined");
       if (!kvValueBuf) {
         if (!kv.optional) {
-          throw new KmsError(`Key release policy '${kvKey}' not found in the key release policy map`, logContext);        }
+          throw new KmsError(`Key release policy '${kvKey}' not found in the key release policy map`, logContext);
+        }
       } else {
         let kvValue = ccf.bufToStr(kvValueBuf!);
         try {
@@ -300,7 +384,8 @@ export class KeyReleasePolicy implements IKeyReleasePolicy {
             kvValue,
           ) as IKeyReleasePolicySnpProps;
         } catch (error) {
-          throw new KmsError(`Key release policy ${kvKey} is not a valid JSON object: ${kvValue}`, logContext);        }
+          throw new KmsError(`Key release policy ${kvKey} is not a valid JSON object: ${kvValue}`, logContext);
+        }
       }
     });
 

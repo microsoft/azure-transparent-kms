@@ -1,34 +1,26 @@
 import pytest
-from utils import apply_kms_constitution, apply_key_release_policy, remove_key_release_policy
-from endpoints import keyReleasePolicy
+from endpoints import setKeyReleaseClaims, keyReleasePolicy
 
-# TODO: Assert what we would expect the key release policy to be for all tests
-
-# Disabling this test as this test uses Governance actions
-# This has been replaced by test_keyReleaseClaimsPolicy test instead
-@pytest.mark.skip(reason="Skipping this test as this test uses Governance actions")
-@pytest.mark.xfail(strict=True) # TODO: Fix #175
-def test_keyReleasePolicy_with_no_policy(setup_kms):
+def test_keyReleaseClaim_add_remove(setup_kms, set_exclude_app_table_env):
+    # Add claims by calling SetKeyRelease Endpoints
+    status_code, key_release_json = setKeyReleaseClaims(
+        type="add", claims={
+          "x-ms-ver": ["1.0"],
+          "x-ms-azurevm-debuggersdisabled": True,
+          "x-ms-azurevm-osversion-major": [22, 23]
+        }
+    )
+    assert status_code == 200
     status_code, key_release_json = keyReleasePolicy()
     assert status_code == 200
-
-# Disabling this test as this test uses Governance actions
-# This has been replaced by test_keyReleaseClaimsPolicy test instead
-@pytest.mark.skip(reason="Skipping this test as this test uses Governance actions")
-def test_keyReleasePolicy_with_policy_added(setup_kms):
-    apply_kms_constitution()
-    apply_key_release_policy()
-    status_code, key_release_json = keyReleasePolicy()
-    assert status_code == 200
-
-# Disabling this test as this test uses Governance actions
-# This has been replaced by test_keyReleaseClaimsPolicy test instead
-@pytest.mark.skip(reason="Skipping this test as this test uses Governance actions")
-def test_keyReleasePolicy_with_policy_added_then_removed(setup_kms):
-    apply_kms_constitution()
-    apply_key_release_policy()
-    remove_key_release_policy()
-    status_code, key_release_json = keyReleasePolicy()
+    assert key_release_json["claims"]["x-ms-ver"] == ["1.0"]
+    assert key_release_json["claims"]["x-ms-azurevm-debuggersdisabled"] == True
+    assert key_release_json["claims"]["x-ms-azurevm-osversion-major"] == [22, 23]
+    
+    # Remove Claims
+    status_code, key_release_json = setKeyReleaseClaims(
+        type="remove", claims={"x-ms-attestation-type": "test-value"}
+    )
     assert status_code == 200
 
 

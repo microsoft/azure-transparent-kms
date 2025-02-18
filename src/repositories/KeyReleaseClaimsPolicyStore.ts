@@ -24,7 +24,7 @@ export class KeyReleaseClaimsPolicyStore {
     // it appears to me claims is the Key, along with other operators
     // as a result for now just store claims as object on key claims
     // @yf23 to confirm and refactor this method as needed
-    this._store.set("claims", claims as IKeyReleasePolicyClaims);
+    this._store.set(claimType, claims as IKeyReleasePolicyClaims);
     console.log(`KRP Updated claim(s) stored successfully for type: ${claimType}.`);
     };
 

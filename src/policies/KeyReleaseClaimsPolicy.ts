@@ -1,12 +1,19 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { IMaaAttestationReport } from "../attestation/IMaaAttestationReport";
-import { IAttestationReport } from "../attestation/ISnpAttestationReport";
+
 import { KeyReleaseClaimsPolicyStore } from "../repositories/KeyReleaseClaimsPolicyStore";
+import { IMaaKeyReleasePolicyClaims } from "./IMaaKeyReleasePolicyClaims";
+import { IKeyReleasePolicySnpProps } from "./IKeyReleasePolicySnpProps";
 
-export type IKeyReleasePolicyClaims = Partial<IAttestationReport> & Partial<IMaaAttestationReport>;
+// Note: This interface should be clarified by the team if it should support IKeyReleasePolicySnpProps or not 
+// for now to avoid breaking changes we will keep it as is and make it compatible to set SNP claims
+export type IKeyReleasePolicyClaims = Partial<IKeyReleasePolicySnpProps> & Partial<IMaaKeyReleasePolicyClaims>;
 
+// Wrapper class to provide Add and Remove functionality for claims on KeyReleaseClaimsPolicyStore
+// Check with the team if this should be part of Policy or just a helper class
+
+// Add claims to the store
 export const add = (
   map: KeyReleaseClaimsPolicyStore,
   claimType: string,
@@ -16,7 +23,7 @@ export const add = (
   map.storeClaims(claimType, claims);
 };
 
-
+// Remove claims from the store
 export const remove = (
   map: KeyReleaseClaimsPolicyStore,
   claimType: string,

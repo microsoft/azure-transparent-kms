@@ -118,6 +118,7 @@ export const keyReleasePolicy = (
   try {
     const result =
       KeyReleasePolicy.getKeyReleasePolicyFromMap(ccf.kv[keyReleaseMapName], logContext);
+      console.log(`Key release policy Result: ${JSON.stringify(result)}`, logContext);
       return ServiceResult.Succeeded<IKeyReleasePolicy>(result, logContext);
   } catch (error: any) {
     return ServiceResult.Failed<string>({ errorMessage: error.message }, 500, logContext);

@@ -55,6 +55,7 @@ def setup_Default_JWT_ReleaseClaims_Policy(setup_kms, request):
     jwt_validation_policy = {**default_jwt_validation_policy, **overrides.get("jwt_validation_policy", {})}
 
     # Apply JWT Issuer
+    # @yf23 this possibly should be a possible endpoint or a separate configuration
     trust_jwt_issuer(iss=jwt_issuer)
 
     # Set JWT Validation Policy
@@ -87,33 +88,3 @@ def setup_Default_JWT_ReleaseClaims_Policy(setup_kms, request):
     # Apply KeyRelease Claims Policy
     status_code, _ = setKeyReleaseClaims(type="claims", claims=key_release_claims)
     assert status_code == 200
-
-    # # Setup Default Demo JWT Issuer
-    # trust_jwt_issuer(iss="http://Demo-jwt-issuer")
-    # # Set JWT Validation Policy by calling SetJwtValidationPolicy endpt
-    # status_code, _ = setJwtValidationPolicy(
-    #     jwt_validation_policy={
-    #         "issuer": "http://Demo-jwt-issuer",
-    #         "validation_policy": {
-    #       "iss": "http://Demo-jwt-issuer",
-    #       "sub": "c0d8e9a7-6b8e-4e1f-9e4a-3b2c1d0f5a6b",
-    #       "name": "Cool caller"
-    #     },
-    #     }
-    # )
-    # assert status_code == 200
-    # # Setup KeyRelease Claims Default Policies for testing purpose
-    # # note this should be overridden in test if needed
-    # status_code, _ = setKeyReleaseClaims(
-    # type="claims", claims={
-    #       "x-ms-ver": ["1.0"],
-    #       "x-ms-azurevm-debuggersdisabled": True,
-    #       "x-ms-azurevm-osversion-major": [22, 23],
-    #       "x-ms-azurevm-os-provisioning.node-policy-identity.eventVersion": 1,
-    #       "x-ms-azurevm-os-provisioning.node-policy-identity.policyId": "openai-whisper",
-    #       "x-ms-azurevm-os-provisioning.node-policy-identity.signer": "8fe6e7a314b8695b21710cebf0265e8d7bbaabde26f431c407faf16fcbd6b924",
-    #       "x-ms-azurevm-os-provisioning.os-image-identity.diskId": "singularity.ubuntu-22.04",
-    #       "x-ms-azurevm-os-provisioning.os-image-identity.eventVersion": 1,
-    #       "x-ms-azurevm-os-provisioning.os-image-identity.signer": "f9cce5b7bdc2aaacfc4c78cb2b7515459aded8149287b74667bb2f178b0cf7b9"
-    #     })
-    # assert status_code == 200

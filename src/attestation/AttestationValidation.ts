@@ -139,7 +139,7 @@ export const validateAttestation = (
       keyReleasePolicy,
       attestationClaims,
     );
-    return policyValidationResult;
+    return policyValidationResult as ServiceResult<string | IAttestationReport>;
   } catch (exception: any) {
     return ServiceResult.Failed<string>(
       { errorMessage: `Internal error: ${exception.message}` },

@@ -54,7 +54,7 @@ export const setSettingsPolicy = (
           `[INFO] [scope=set_settings_policy] Settings policy ${jsonItems} saved in ${settingsMapName}`,
         );
 
-        return ServiceResult.Succeeded<string>("Key rotation policy set successfully.", logContext);
+        return ServiceResult.Succeeded<string>("Setting policy set successfully.", logContext);
     } catch (error: any) {
         return ServiceResult.Failed<string>({ errorMessage: error.message }, 500, logContext);
     }

@@ -37,9 +37,12 @@ def setup_kms():
         f"scripts/{TEST_ENVIRONMENT}/down.sh",
     )
 
+# Fixture that does not need Governance MAA constitution
+# This fixture mostly sets things up by calling newly added endpoints
+# These endpoints update state in CCF Application tables
+# This fixture is used by all system tests
 @pytest.fixture(scope="function", autouse=True)
 def setup_Default_JWT_ReleaseClaims_Policy(setup_kms, request):
-    apply_kms_constitution()
 
     default_jwt_issuer = "http://Demo-jwt-issuer"
     default_jwt_validation_policy = {

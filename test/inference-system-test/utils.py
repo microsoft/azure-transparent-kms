@@ -1,7 +1,9 @@
+import ccf.cose
 import json
 import os
 import subprocess
 import tempfile
+import time
 
 
 REPO_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -96,3 +98,52 @@ def get_test_attestation():
 
 def get_test_wrapping_key():
     return '"-----BEGIN PUBLIC KEY-----\\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA0L9FDBjydkdstv7OKqkw\\ndMiugRqlSHC9Lchfd7jh5uCzv602LhlBJQeEFYchvaEquISLQFoZxEkpGEbEb15v\\nN2dKwTCi0ioEGBidtFmuKiVZqf46Hbnw4OdinQHrlGO2PRsRE+DYPOy6xrZTKEnD\\nK+OnHDsZ0U2qNJ80IjbxcC83lQpaMx8Ij8AddGY9Msv0TMMgaVsrDaQYLC8tmJih\\nxVI2f5BHFbTy3pw4Sq9xp6se+S/ycOUF0M6RFArZcD9uR/NxJKFJJlGOKskgwLnT\\nlhPck4sGeLhHUydRdqw0+h8EDsTIUysNxMOYtZETaVuBS+ISMy8+WQgVPs12Ujr3\\n17kaHeZr8Lq0bwaFHruRBpNwqtUCBv57IBpe7hnEDDdvOvN/tPubf1dv3HxEt42T\\nqqfozS+a9+1hcI8hpNlEjh+qcy1BmhSOXvmRzlhauX4xv6OLCNkRxo6x2Q/1moDC\\nPgnaJJVIuESr07xnC8fk43i5qFzEXQO3hwNsjd7sqFBBTb6t5N6Nm37mMNTqsDky\\nniAeFG+1gK/UD+cMPfbUIDaCqpCDwrTX0gMqqUTDG6eNPmQaOa+slici3h9WLaNy\\nmEzfKqJMBggKib/+e4Eb/ENdvxeT1X2YXpZ3tjZE+bRoiDgN4FYqBzYtZ/ieRcsq\\n4fPqgZPbh+ivT2o7QutzWH0CAwEAAQ==\\n-----END PUBLIC KEY-----\\n"'  # pragma: allowlist secret
+
+def _sign_payload(
+    self,
+    private_key_path: str,
+    public_key: str,
+    msg_type: str,
+    json_payload: dict,
+    skip_reqd_header: bool = False,
+) -> bytes:
+    """
+    Sign a JSON payload using COSE signing with the provided identity.
+#       --signing-cert $signing_cert \
+#   --signature $signature_file \
+    Args:
+        public_key and private_key_path: The identity containing the key and certificate for signing.
+        msg_type (str): The message type to include in the signed payload.
+        json_payload (dict): The JSON payload to be signed.
+
+    Returns:
+        bytes: The COSE-signed payload.
+
+    Logs any errors that occur during the signing process.
+    """
+    try:
+        print(f"Signing payload with msg_type: {msg_type}")
+        serialised_payload = json.dumps(json_payload).encode()
+        with open(private_key_path, "r") as key_file:
+            key = key_file.read()
+        if not key:
+            raise ValueError("Key file is empty or improperly formatted.")
+        with open(public_key, "r") as cert_file:
+            cert = cert_file.read()
+        if not cert:
+            raise ValueError("Cert file is empty or improperly formatted.")
+        phdr = None
+        if skip_reqd_header:
+            phdr = {"kms.msg.type": msg_type}
+        else:
+            phdr = {
+                "kms.msg.type": msg_type,
+                "kms.msg.created_at": int(time.time()),
+            }
+        return ccf.cose.create_cose_sign1(serialised_payload, key, cert, phdr)
+    except FileNotFoundError as e:
+        print(f"File not found during signing: {e}")
+        raise
+    except Exception as e:
+        print(f"Error signing payload: {e}")
+        raise

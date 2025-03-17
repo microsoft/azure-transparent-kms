@@ -56,6 +56,7 @@
         "forwarding_required": "always",
         "authn_policies": [
           "user_cert",
+          "user_cose_sign1",
           "jwt"
         ],
         "mode": "readwrite",
@@ -265,6 +266,7 @@
         "forwarding_required": "always",
         "authn_policies": [
           "user_cert",
+          "user_cose_sign1",
           "jwt"
         ],
         "mode": "readwrite",
@@ -313,6 +315,7 @@
         "forwarding_required": "always",
         "authn_policies": [
           "user_cert",
+          "user_cose_sign1",
           "jwt"
         ],
         "mode": "readwrite",
@@ -332,6 +335,7 @@
         "forwarding_required": "always",
         "authn_policies": [
           "user_cert",
+          "user_cose_sign1",
           "jwt"
         ],
         "mode": "readwrite",
@@ -351,6 +355,7 @@
         "forwarding_required": "always",
         "authn_policies": [
           "user_cert",
+          "user_cose_sign1",
           "jwt"
         ],
         "mode": "readwrite",

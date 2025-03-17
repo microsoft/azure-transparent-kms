@@ -99,10 +99,7 @@ def get_test_attestation():
 def get_test_wrapping_key():
     return '"-----BEGIN PUBLIC KEY-----\\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA0L9FDBjydkdstv7OKqkw\\ndMiugRqlSHC9Lchfd7jh5uCzv602LhlBJQeEFYchvaEquISLQFoZxEkpGEbEb15v\\nN2dKwTCi0ioEGBidtFmuKiVZqf46Hbnw4OdinQHrlGO2PRsRE+DYPOy6xrZTKEnD\\nK+OnHDsZ0U2qNJ80IjbxcC83lQpaMx8Ij8AddGY9Msv0TMMgaVsrDaQYLC8tmJih\\nxVI2f5BHFbTy3pw4Sq9xp6se+S/ycOUF0M6RFArZcD9uR/NxJKFJJlGOKskgwLnT\\nlhPck4sGeLhHUydRdqw0+h8EDsTIUysNxMOYtZETaVuBS+ISMy8+WQgVPs12Ujr3\\n17kaHeZr8Lq0bwaFHruRBpNwqtUCBv57IBpe7hnEDDdvOvN/tPubf1dv3HxEt42T\\nqqfozS+a9+1hcI8hpNlEjh+qcy1BmhSOXvmRzlhauX4xv6OLCNkRxo6x2Q/1moDC\\nPgnaJJVIuESr07xnC8fk43i5qFzEXQO3hwNsjd7sqFBBTb6t5N6Nm37mMNTqsDky\\nniAeFG+1gK/UD+cMPfbUIDaCqpCDwrTX0gMqqUTDG6eNPmQaOa+slici3h9WLaNy\\nmEzfKqJMBggKib/+e4Eb/ENdvxeT1X2YXpZ3tjZE+bRoiDgN4FYqBzYtZ/ieRcsq\\n4fPqgZPbh+ivT2o7QutzWH0CAwEAAQ==\\n-----END PUBLIC KEY-----\\n"'  # pragma: allowlist secret
 
-def _sign_payload(
-    self,
-    private_key_path: str,
-    public_key: str,
+def sign_payload(
     msg_type: str,
     json_payload: dict,
     skip_reqd_header: bool = False,
@@ -122,13 +119,29 @@ def _sign_payload(
     Logs any errors that occur during the signing process.
     """
     try:
+        kms_user_privk_path = os.environ.get('KMS_USER_PRIVK_PATH')
+        kms_user_cert_path = os.environ.get('KMS_USER_CERT_PATH')
+
+        # Check if they exist
+        if kms_user_privk_path is None:
+            print("Error: KMS_USER_PRIVK_PATH environment variable is not set")
+            # Handle the error as needed
+            
+        if kms_user_cert_path is None:
+            print("Error: KMS_USER_CERT_PATH environment variable is not set")
+            # Handle the error as needed
+
+        # Use the variables
+        print(f"Private key path: {kms_user_privk_path}")
+        print(f"Certificate path: {kms_user_cert_path}")
         print(f"Signing payload with msg_type: {msg_type}")
+
         serialised_payload = json.dumps(json_payload).encode()
-        with open(private_key_path, "r") as key_file:
+        with open(kms_user_privk_path, "r") as key_file:
             key = key_file.read()
         if not key:
             raise ValueError("Key file is empty or improperly formatted.")
-        with open(public_key, "r") as cert_file:
+        with open(kms_user_cert_path, "r") as cert_file:
             cert = cert_file.read()
         if not cert:
             raise ValueError("Cert file is empty or improperly formatted.")

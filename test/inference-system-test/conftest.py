@@ -2,7 +2,7 @@ import json
 import os
 import subprocess
 import pytest
-from utils import deploy_app_code, apply_kms_constitution, trust_jwt_issuer
+from utils import deploy_app_code, apply_kms_constitution, trust_jwt_issuer, sign_payload
 from endpoints import setKeyReleaseClaims, setJwtValidationPolicy
 
 REPO_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -87,7 +87,8 @@ def setup_Default_JWT_ReleaseClaims_Policy(setup_kms, request):
 
     # Merge KeyRelease Claims overrides if provided
     key_release_claims = {**default_key_release_claims, **overrides.get("key_release_claims", {})}
+    cose_signed_payliad = sign_payload("setKeyReleaseClaims", key_release_claims)
 
     # Apply KeyRelease Claims Policy
-    status_code, _ = setKeyReleaseClaims(type="claims", claims=key_release_claims)
+    status_code, _ = setKeyReleaseClaims(type="claims", claims=key_release_claims, signed_bytes=cose_signed_payliad)
     assert status_code == 200

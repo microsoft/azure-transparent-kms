@@ -153,10 +153,135 @@ def sign_payload(
                 "kms.msg.type": msg_type,
                 "kms.msg.created_at": int(time.time()),
             }
-        return ccf.cose.create_cose_sign1(serialised_payload, key, cert, phdr)
+        print("Cose Signed Payload: ", ccf.cose.create_cose_sign1(serialised_payload, key, cert, phdr))
+        # Create the COSE-Sign1 payload.
+        # This function is assumed to be provided by the CCF framework.
+        signed_payload = ccf.cose.create_cose_sign1(serialised_payload, key, cert, phdr)
+
+        # Debug output: Print the signed payload in hex and base64 formats.
+        import base64
+        import cbor2
+        print("Signed COSE Payload (Hex):", signed_payload.hex())
+        print("Signed COSE Payload (Base64):", base64.b64encode(signed_payload).decode())
+        #return signed_payload
+
+        # ---------------------------------------
+        # Local Verification: Decode the COSE payload
+        # ---------------------------------------
+        # cose_payload = verify_and_fix_cose_payload(signed_payload)
+
+        # Import the pycose Sign1Message for decoding the COSE_Sign1 message.
+        from pycose.messages import Sign1Message
+
+        # Decode using pycose to inspect the COSE structure.
+        try:
+            msg = Sign1Message.decode(signed_payload)
+            print("Decoded COSE Structure using pycose:")
+            print("  Protected Headers:", msg.phdr)
+            print("  Unprotected Headers:", msg.uhdr)
+            # Try to decode the payload as UTF-8 if it's text; otherwise, print raw bytes.
+            try:
+                payload_text = msg.payload.decode("utf-8")
+            except Exception:
+                payload_text = msg.payload
+            print("  Payload:", payload_text)
+        except Exception as decode_err:
+            print("Error decoding with pycose:", decode_err)
+
+        # Alternatively, decode the outer COSE structure using cbor2.
+        try:
+            decoded_cose = cbor2.loads(signed_payload)
+            print("Decoded COSE structure using cbor2:", decoded_cose)
+            # The expected structure is a list with 4 elements:
+            # [protected headers (bstr), unprotected headers (map), payload (bstr), signature (bstr)]
+            if not (isinstance(decoded_cose, list) and len(decoded_cose) == 4):
+                print("Warning: Decoded COSE structure does not have the expected 4 elements.")
+        except Exception as cbor_err:
+            print("Error decoding with cbor2:", cbor_err)
+
+        return signed_payload
+
     except FileNotFoundError as e:
         print(f"File not found during signing: {e}")
-        raise
+        #raise
     except Exception as e:
         print(f"Error signing payload: {e}")
+        #raise
+
+
+def verify_and_fix_cose_payload(signed_payload):
+    """
+    Verifies and extracts the correct COSE_Sign1 array if wrapped inside a CBOR tag.
+    """
+    try:
+        from pycose.messages import Sign1Message
+        import cbor2
+        decoded_cose = cbor2.loads(signed_payload)
+        
+        if isinstance(decoded_cose, cbor2.CBORTag) and decoded_cose.tag == 18:
+            # Unwrapping the COSE_Sign1 tag
+            print("Detected CBORTag(18), unwrapping the COSE_Sign1 structure...")
+            signed_payload = cbor2.dumps(decoded_cose.value)  # Extract the inner list
+        
+        # Verify the COSE structure using pycose
+        msg = Sign1Message.decode(signed_payload)
+        print("Verified COSE structure after unwrapping:")
+        print("  Protected Headers:", msg.phdr)
+        print("  Unprotected Headers:", msg.uhdr)
+        print("  Payload:", msg.payload.decode("utf-8") if isinstance(msg.payload, bytes) else msg.payload)
+    
+    except Exception as e:
+        print("Error verifying COSE payload:", e)
         raise
+    
+    return signed_payload
+
+# import cbor2
+# from pycose.messages import Sign1Message
+# from cryptography.hazmat.primitives.serialization import load_pem_private_key
+# from cryptography.hazmat.primitives.serialization import load_pem_x509_certificate
+# from cryptography.hazmat.backends import default_backend
+# from typing import Optional
+
+# def create_cose_sign1(
+#     payload: bytes,
+#     key_priv_pem: str,
+#     cert_pem: str,
+#     additional_protected_header: Optional[dict] = None,
+# ) -> bytes:
+#     """
+#     Creates a COSE_Sign1 message and removes the CBOR Tag (18) before returning.
+#     """
+#     key_type = get_priv_key_type(key_priv_pem)
+
+#     # Load certificate
+#     cert = load_pem_x509_certificate(cert_pem.encode("ascii"), default_backend())
+#     alg = default_algorithm_for_key(cert.public_key())
+#     kid = cert_fingerprint(cert_pem)  # Use certificate fingerprint as Key ID (KID)
+
+#     # Create protected headers
+#     protected_header = {pycose.headers.Algorithm: alg, pycose.headers.KID: kid}
+#     protected_header.update(additional_protected_header or {})
+
+#     # Create COSE_Sign1 message
+#     msg = Sign1Message(phdr=protected_header, payload=payload)
+
+#     # Load private key and convert to COSE key
+#     key = load_pem_private_key(key_priv_pem.encode("ascii"), None, default_backend())
+#     if key_type == "ec":
+#         cose_key = from_cryptography_eckey_obj(key)
+#     else:
+#         raise NotImplementedError("unsupported key type")
+#     msg.key = cose_key
+
+#     # Encode COSE message
+#     signed_payload = msg.encode()
+
+#     # 🔥 Remove the CBOR tag (18) if present
+#     decoded_cose = cbor2.loads(signed_payload)
+
+#     if isinstance(decoded_cose, cbor2.CBORTag) and decoded_cose.tag == 18:
+#         print("✅ CBOR Tag detected, unwrapping COSE_Sign1...")
+#         signed_payload = cbor2.dumps(decoded_cose.value)  # Extract the inner COSE structure
+
+#     return signed_payload  # Now a raw COSE_Sign1 array

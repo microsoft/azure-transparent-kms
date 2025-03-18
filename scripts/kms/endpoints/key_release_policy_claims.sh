@@ -1,4 +1,4 @@
-# #!/bin/bash
+#!/bin/bash
 
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT license.
@@ -99,7 +99,25 @@ keyReleasePolicyClaims() {
         # Use the provided signed bytes
         signed_payload="$signed_bytes"
     fi
-    
+
+    # Capture both response body and status code
+    response=$(curl -X POST "${KMS_URL}/app/setKeyReleasePolicyClaims" \
+    -H "Content-Type: application/cose" \
+    --data-binary "@-" \
+    --cacert "${KMS_SERVICE_CERT_PATH}" \
+    -s \
+    -w "\n%{http_code}" \
+    <<< "${signed_bundle}")
+
+    # Extract status code (last line)
+    status_code=$(echo "$response" | tail -n1)
+
+    # Extract response body (all lines except the last one)
+    response_body=$(echo "$response" | sed '$d')
+
+    # Print or use the captured values
+    echo "Status code: $status_code"
+    echo "Response body: $response_body"
     # Send the signed payload
     response=$(curl $KMS_URL/app/setKeyReleasePolicyClaims -k \
         -H "Content-Type: application/cose" \

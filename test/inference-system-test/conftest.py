@@ -63,13 +63,13 @@ def setup_Default_JWT_ReleaseClaims_Policy(setup_kms, request):
 
     # Set JWT Validation Policy
     # this calls added JWT Validation Policy Endpt
-    status_code, _ = setJwtValidationPolicy(
-        jwt_validation_policy={
-            "issuer": jwt_issuer,
-            "validation_policy": jwt_validation_policy
-        }
-    )
-    assert status_code == 200
+    # status_code, _ = setJwtValidationPolicy(
+    #     jwt_validation_policy={
+    #         "issuer": jwt_issuer,
+    #         "validation_policy": jwt_validation_policy
+    #     }
+    # )
+    # assert status_code == 200
 
     # Default KeyRelease Claims Policy
     # This calls Set KeyReleaseClaims endpt

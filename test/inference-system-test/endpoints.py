@@ -72,12 +72,12 @@ def auth(**kwargs):
     return call_endpoint("auth", **kwargs)
 
 
-def setKeyReleaseClaims(type: str, claims: dict, signed_bytes: bytes = None):
+def setKeyReleaseClaims(type: str, claims: dict, cose_signed: bool = False):
     if not type or not claims:
         raise ValueError("Both 'type' and 'claims' are required.")
 
     claims_json = json.dumps(claims)  # Convert the claims dictionary to a JSON string
-    return call_endpoint("key_release_policy_claims", type=type, claims=claims_json, cosePayload=signed_bytes)
+    return call_endpoint("key_release_policy_claims", type=type, claims=claims_json, coseSigned=cose_signed)
 
 
 def setKeyRotationPolicy(key_rotation_policy: dict):

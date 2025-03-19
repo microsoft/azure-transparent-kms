@@ -2,7 +2,7 @@ import json
 import os
 import subprocess
 import pytest
-from utils import deploy_app_code, apply_kms_constitution, trust_jwt_issuer, sign_payload
+from utils import deploy_app_code, trust_jwt_issuer, cose_sign_payload
 from endpoints import setKeyReleaseClaims, setJwtValidationPolicy
 
 REPO_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -44,6 +44,7 @@ def setup_kms():
 @pytest.fixture(scope="function", autouse=True)
 def setup_Default_JWT_ReleaseClaims_Policy(setup_kms, request):
 
+    default_cose_signed = False
     default_jwt_issuer = "http://Demo-jwt-issuer"
     default_jwt_validation_policy = {
         "iss": default_jwt_issuer,
@@ -52,7 +53,7 @@ def setup_Default_JWT_ReleaseClaims_Policy(setup_kms, request):
     }
     # Check if test overrides were provided
     overrides = getattr(request, "param", {})
-    
+
     # Merge overrides with default values
     jwt_issuer = overrides.get("jwt_issuer", default_jwt_issuer)
     jwt_validation_policy = {**default_jwt_validation_policy, **overrides.get("jwt_validation_policy", {})}
@@ -63,13 +64,13 @@ def setup_Default_JWT_ReleaseClaims_Policy(setup_kms, request):
 
     # Set JWT Validation Policy
     # this calls added JWT Validation Policy Endpt
-    # status_code, _ = setJwtValidationPolicy(
-    #     jwt_validation_policy={
-    #         "issuer": jwt_issuer,
-    #         "validation_policy": jwt_validation_policy
-    #     }
-    # )
-    # assert status_code == 200
+    status_code, _ = setJwtValidationPolicy(
+        jwt_validation_policy={
+            "issuer": jwt_issuer,
+            "validation_policy": jwt_validation_policy
+        }
+    )
+    assert status_code == 200
 
     # Default KeyRelease Claims Policy
     # This calls Set KeyReleaseClaims endpt
@@ -79,16 +80,21 @@ def setup_Default_JWT_ReleaseClaims_Policy(setup_kms, request):
         "x-ms-azurevm-osversion-major": [22, 23],
         "x-ms-azurevm-os-provisioning.node-policy-identity.eventVersion": 1,
         "x-ms-azurevm-os-provisioning.node-policy-identity.policyId": "openai-whisper",
-        "x-ms-azurevm-os-provisioning.node-policy-identity.signer": "8fe6e7a314b8695b21710cebf0265e8d7bbaabde26f431c407faf16fcbd6b924",
+        # These values are not secrets, marking them as false positives
+        "x-ms-azurevm-os-provisioning.node-policy-identity.signer": "8fe6e7a314b8695b21710cebf0265e8d7bbaabde26f431c407faf16fcbd6b924",  # pragma: allowlist secret
         "x-ms-azurevm-os-provisioning.os-image-identity.diskId": "singularity.ubuntu-22.04",
         "x-ms-azurevm-os-provisioning.os-image-identity.eventVersion": 1,
-        "x-ms-azurevm-os-provisioning.os-image-identity.signer": "f9cce5b7bdc2aaacfc4c78cb2b7515459aded8149287b74667bb2f178b0cf7b9"
+        "x-ms-azurevm-os-provisioning.os-image-identity.signer": "f9cce5b7bdc2aaacfc4c78cb2b7515459aded8149287b74667bb2f178b0cf7b9" # pragma: allowlist secret
     }
 
     # Merge KeyRelease Claims overrides if provided
     key_release_claims = {**default_key_release_claims, **overrides.get("key_release_claims", {})}
-    cose_signed_payliad = sign_payload("setKeyReleaseClaims", key_release_claims)
+    cose_signed = overrides.get("cose_signed", default_cose_signed)
+    if cose_signed:
+        json_payload={"claimType": "claims", "claims": key_release_claims}
+        # Cose Sign Payload
+        cose_sign_payload("setKeyReleaseClaims", json_payload)
 
     # Apply KeyRelease Claims Policy
-    status_code, _ = setKeyReleaseClaims(type="claims", claims=key_release_claims, signed_bytes=cose_signed_payliad)
+    status_code, _ = setKeyReleaseClaims(type="claims", claims=key_release_claims, cose_signed=cose_signed)
     assert status_code == 200

@@ -9,7 +9,7 @@ import { IValidatorService } from "./IValidationService";
 import { UserCertValidator } from "./certs/UserCertValidator";
 import { MemberCertValidator } from "./certs/MemberCertValidator";
 import { Logger, LogContext } from "../utils/Logger";
-import { UserCoseSignAuthnIdentity } from "./CoseSignValidator";
+import { UserCoseSignAuthnIdentity } from "./cose/CoseSignValidator";
 
 /**
  * CCF authentication policies
@@ -61,6 +61,7 @@ export class AuthenticationService implements IAuthenticationService {
       const caller = request.caller as unknown as ccfapp.AuthnIdentityCommon;
       if (!caller) {
         // no caller policy
+        console.log("LOG NO CALLER POLICY");
         return [caller, ServiceResult.Succeeded("", this.logContext)];
       }
       Logger.debug(
@@ -79,6 +80,16 @@ export class AuthenticationService implements IAuthenticationService {
             errorType: "AuthenticationError",
           }, 400, this.logContext),
         ];
+      }
+      let serviceResult = validator!.validate(request);
+      if (serviceResult.success){
+        console.log("LOG AUTHENTICATION SUCCESS");
+        console.log(serviceResult.body);
+        console.log("LOG AUTHENTICATION SUCCESS END");
+      }
+
+      if (caller.policy === CcfAuthenticationPolicyEnum.CoseSigned) {
+        return [caller, serviceResult]
       }
 
       return [caller, validator!.validate(request)];

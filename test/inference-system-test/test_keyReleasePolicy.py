@@ -16,13 +16,36 @@ def test_keyReleaseClaim_add_remove(setup_kms):
     assert key_release_json["claims"]["x-ms-ver"] == ["1.0"]
     assert key_release_json["claims"]["x-ms-azurevm-debuggersdisabled"] == True
     assert key_release_json["claims"]["x-ms-azurevm-osversion-major"] == [22, 23]
-    
+
     # Remove Claims
     status_code, key_release_json = setKeyReleaseClaims(
         type="remove", claims={"x-ms-attestation-type": "test-value"}
     )
     assert status_code == 200
 
+
+@pytest.mark.parametrize(
+    "setup_Default_JWT_ReleaseClaims_Policy",
+    [{
+        "cose_signed": True,
+    }],
+    indirect=True
+)
+def test_keyReleaseClaim_add_remove(setup_kms):
+    # Add claims by calling SetKeyRelease Endpoints
+    status_code, key_release_json = setKeyReleaseClaims(
+        type="add", claims={
+          "x-ms-ver": ["1.0"],
+          "x-ms-azurevm-debuggersdisabled": True,
+          "x-ms-azurevm-osversion-major": [22, 23]
+        }
+    )
+    assert status_code == 200
+    status_code, key_release_json = keyReleasePolicy()
+    assert status_code == 200
+    assert key_release_json["claims"]["x-ms-ver"] == ["1.0"]
+    assert key_release_json["claims"]["x-ms-azurevm-debuggersdisabled"] == True
+    assert key_release_json["claims"]["x-ms-azurevm-osversion-major"] == [22, 23]
 
 if __name__ == "__main__":
     import pytest

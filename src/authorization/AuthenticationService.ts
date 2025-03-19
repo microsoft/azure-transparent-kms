@@ -81,17 +81,6 @@ export class AuthenticationService implements IAuthenticationService {
           }, 400, this.logContext),
         ];
       }
-      let serviceResult = validator!.validate(request);
-      if (serviceResult.success){
-        console.log("LOG AUTHENTICATION SUCCESS");
-        console.log(serviceResult.body);
-        console.log("LOG AUTHENTICATION SUCCESS END");
-      }
-
-      if (caller.policy === CcfAuthenticationPolicyEnum.CoseSigned) {
-        return [caller, serviceResult]
-      }
-
       return [caller, validator!.validate(request)];
     } catch (ex) {
       return [

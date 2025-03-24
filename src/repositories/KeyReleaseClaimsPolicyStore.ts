@@ -18,7 +18,7 @@ export class KeyReleaseClaimsPolicyStore {
  * @param claimType The key type.
  * @param claims The single claim object (one or more fields from IClaims).
  */
-  public storeClaims(claimType: string, claims: Partial<IKeyReleasePolicyClaims>): void {
+  public storeKeyReleaseClaims(claimType: string, claims: Partial<IKeyReleasePolicyClaims>): void {
     // Their is something not clear as per the checked in constitution claimType: ADD is the key
     // but refering to this file: https://github.com/microsoft/azure-transparent-kms/blob/f268aac6f4ea224123d0bb330c8f93722ec5fa1b/src/policies/KeyReleasePolicy.ts#L285
     // it appears to me claims is the Key, along with other operators
@@ -61,7 +61,7 @@ export class KeyReleaseClaimsPolicyStore {
    * @param claimType The key type.
    * @param claims The claims to remove.
    */
-  public removeIndividualClaims(claimType: string, claims: Partial<IKeyReleasePolicyClaims>): void {
+  public removeKeyReleaseClaims(claimType: string, claims: Partial<IKeyReleasePolicyClaims>): void {
     const claimKeys = Object.keys(claims);
 
     // Fetch existing claims for this type
@@ -85,6 +85,53 @@ export class KeyReleaseClaimsPolicyStore {
       console.log(`KRP remove => Updated claims for type: ${claimType} in CCF KVMap.`);
     }
   }
+
+  public storeKeyReleaseOperatorClaims(claimType: "gt" | "gte" | "in", claims: Record<string, any>): void {
+    const claimsKeys = Object.keys(claims);
+
+    let existingClaims: Partial<IKeyReleasePolicyClaims> = this._store.get(claimType) || {};
+
+    claimsKeys.forEach((key) => {
+      const value = claims[key];
+
+      if (value !== undefined) {
+        if (claimType === "in") {
+          if (!Array.isArray(value)) {
+            throw new Error(`'in' operator claim '${key}' must be an array`);
+          }
+        } else {
+          if (Array.isArray(value)) {
+            throw new Error(`'${claimType}' operator claim '${key}' cannot be an array`);
+          }
+        }
+
+        (existingClaims as Record<string, unknown>)[key] = value;
+      }
+    });
+
+    this._store.set(claimType, existingClaims);
+    console.log(`KRP Operator claim(s) stored successfully for type: ${claimType}.`);
+  }
+
+  public removeKeyReleaseOperatorClaims(claimType: "gt" | "gte" | "in", claims: Record<string, any>): void {
+    const claimsKeys = Object.keys(claims);
+
+    let existingClaims: Partial<IKeyReleasePolicyClaims> = this._store.get(claimType) || {};
+
+    if (!existingClaims) {
+      throw new Error(`Operator type '${claimType}' does not exist in the store.`);
+    }
+
+    claimsKeys.forEach((key) => {
+      if (key in existingClaims) {
+        delete (existingClaims as Record<string, unknown>)[key];
+      }
+    });
+
+    this._store.set(claimType, existingClaims);
+    console.log(`KRP Operator claim(s) removed successfully for type: ${claimType}.`);
+  }
+
 
   /**
    * Fetches claims from the store.

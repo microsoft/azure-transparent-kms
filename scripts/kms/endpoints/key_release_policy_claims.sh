@@ -9,15 +9,15 @@ keyReleasePolicyClaims() {
     # Parse arguments passed to the script
     while [[ "$#" -gt 0 ]]; do
         case $1 in
-            --type) 
+            --type)
                 # Store the claim operation type (add/remove)
                 type="$2"
                 shift ;; # Move to the next argument
-            --claims) 
+            --claims)
                 # Store the JSON string containing the claims
                 claims="$2"
                 shift ;; # Move to the next argument
-            *) 
+            *)
                 # Handle unknown parameters and exit with an error
                 echo "Unknown parameter: $1"
                 exit 1 ;;
@@ -37,7 +37,7 @@ keyReleasePolicyClaims() {
         --cert "$KMS_USER_CERT_PATH" \
         --key "$KMS_USER_PRIVK_PATH" \
         -H "Content-Type: application/json" \
-         -d "{\"claimType\": \"$type\", \"claims\": $claims}" \
+         -d "{\"claimType\": \"$type\", \"keyReleaseClaims\": $claims}" \
         -w '\n%{http_code}\n')
 
     # Extract status code (last line)

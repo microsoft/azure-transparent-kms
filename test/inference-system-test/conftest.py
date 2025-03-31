@@ -52,7 +52,7 @@ def setup_Default_JWT_ReleaseClaims_Policy(setup_kms, request):
     }
     # Check if test overrides were provided
     overrides = getattr(request, "param", {})
-    
+
     # Merge overrides with default values
     jwt_issuer = overrides.get("jwt_issuer", default_jwt_issuer)
     jwt_validation_policy = {**default_jwt_validation_policy, **overrides.get("jwt_validation_policy", {})}
@@ -79,15 +79,18 @@ def setup_Default_JWT_ReleaseClaims_Policy(setup_kms, request):
         "x-ms-azurevm-osversion-major": [22, 23],
         "x-ms-azurevm-os-provisioning.node-policy-identity.eventVersion": 1,
         "x-ms-azurevm-os-provisioning.node-policy-identity.policyId": "openai-whisper",
-        "x-ms-azurevm-os-provisioning.node-policy-identity.signer": "8fe6e7a314b8695b21710cebf0265e8d7bbaabde26f431c407faf16fcbd6b924",
+        "x-ms-azurevm-os-provisioning.node-policy-identity.signer": "8fe6e7a314b8695b21710cebf0265e8d7bbaabde26f431c407faf16fcbd6b924", # pragma: allowlist secret
         "x-ms-azurevm-os-provisioning.os-image-identity.diskId": "singularity.ubuntu-22.04",
         "x-ms-azurevm-os-provisioning.os-image-identity.eventVersion": 1,
-        "x-ms-azurevm-os-provisioning.os-image-identity.signer": "f9cce5b7bdc2aaacfc4c78cb2b7515459aded8149287b74667bb2f178b0cf7b9"
+        "x-ms-azurevm-os-provisioning.os-image-identity.signer": "f9cce5b7bdc2aaacfc4c78cb2b7515459aded8149287b74667bb2f178b0cf7b9" # pragma: allowlist secret
     }
 
     # Merge KeyRelease Claims overrides if provided
     key_release_claims = {**default_key_release_claims, **overrides.get("key_release_claims", {})}
+    wrapped_claims = {
+        "claims": key_release_claims
+    }
 
     # Apply KeyRelease Claims Policy
-    status_code, _ = setKeyReleaseClaims(type="claims", claims=key_release_claims)
+    status_code, _ = setKeyReleaseClaims(type="add", claims=wrapped_claims)
     assert status_code == 200

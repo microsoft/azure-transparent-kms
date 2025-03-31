@@ -6,9 +6,24 @@ import { KeyReleaseClaimsPolicyStore } from "../repositories/KeyReleaseClaimsPol
 import { IMaaKeyReleasePolicyClaims } from "./IMaaKeyReleasePolicyClaims";
 import { IKeyReleasePolicySnpProps } from "./IKeyReleasePolicySnpProps";
 
-// Note: This interface should be clarified by the team if it should support IKeyReleasePolicySnpProps or not 
+// Note: This interface should be clarified by the team if it should support IKeyReleasePolicySnpProps or not
 // for now to avoid breaking changes we will keep it as is and make it compatible to set SNP claims
 export type IKeyReleasePolicyClaims = Partial<IKeyReleasePolicySnpProps> & Partial<IMaaKeyReleasePolicyClaims>;
+
+type OperatorType = "gt" | "gte" | "in";
+type OperatorValue = string | number | boolean;
+type KeyReleaseOperatorClaims = Record<string, OperatorValue | OperatorValue[]>;
+
+export interface IKeyReleasePolicyOperatorClaims {
+  gte?: Record<string, number | string | boolean>;
+  gt?: Record<string, number | string | boolean>;
+  in?: Record<string, Array<string | number | boolean>>;
+}
+
+// Extend Claim to support Operator claims (gte, gt, in)
+export type IKeyReleasePolicyClaimsExtended = {
+  claims?: IKeyReleasePolicyClaims;
+} & IKeyReleasePolicyOperatorClaims;
 
 // Wrapper class to provide Add and Remove functionality for claims on KeyReleaseClaimsPolicyStore
 // Check with the team if this should be part of Policy or just a helper class
@@ -20,7 +35,7 @@ export const add = (
   claims: IKeyReleasePolicyClaims
 ): void => {
   console.log(`Add claims from key release policy: ${JSON.stringify(claims)}`);
-  map.storeClaims(claimType, claims);
+  map.storeKeyReleaseClaims(claimType, claims);
 };
 
 // Remove claims from the store
@@ -30,5 +45,23 @@ export const remove = (
   claims: IKeyReleasePolicyClaims
 ): void => {
   console.log(`Remove claims from key release policy : ${JSON.stringify(claims)}`);
-  map.removeIndividualClaims(claimType, claims);
+  map.removeKeyReleaseClaims(claimType, claims);
+};
+
+export const addOperator = (
+  map: KeyReleaseClaimsPolicyStore,
+  operatorType: OperatorType,
+  claims: KeyReleaseOperatorClaims
+): void => {
+  console.log(`[INFO] Add operator claims for ${operatorType}: ${JSON.stringify(claims)}`);
+  map.storeKeyReleaseOperatorClaims(operatorType, claims);
+};
+
+export const removeOperator = (
+  map: KeyReleaseClaimsPolicyStore,
+  operatorType: OperatorType,
+  claims: KeyReleaseOperatorClaims
+): void => {
+  console.log(`[INFO] Remove operator claims for ${operatorType}: ${JSON.stringify(claims)}`);
+  map.removeKeyReleaseOperatorClaims(operatorType, claims);
 };

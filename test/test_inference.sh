@@ -108,19 +108,22 @@ if [ "$status_code" -ne 200 ]; then
 fi
 
 
-claims='{
+claims=$(cat <<EOF
+{
   "claims": {
     "x-ms-ver": ["1.0"],
     "x-ms-azurevm-debuggersdisabled": true,
     "x-ms-azurevm-osversion-major": [22],
     "x-ms-azurevm-os-provisioning.node-policy-identity.eventVersion": 1,
     "x-ms-azurevm-os-provisioning.node-policy-identity.policyId": "openai-whisper",
-    "x-ms-azurevm-os-provisioning.node-policy-identity.signer": "8fe6e7a314b8695b21710cebf0265e8d7bbaabde26f431c407faf16fcbd6b924", # pragma: allowlist secret
+    "x-ms-azurevm-os-provisioning.node-policy-identity.signer": "8fe6e7a314b8695b21710cebf0265e8d7bbaabde26f431c407faf16fcbd6b924",
     "x-ms-azurevm-os-provisioning.os-image-identity.diskId": "singularity.ubuntu-22.04",
     "x-ms-azurevm-os-provisioning.os-image-identity.eventVersion": 1,
-    "x-ms-azurevm-os-provisioning.os-image-identity.signer": "f9cce5b7bdc2aaacfc4c78cb2b7515459aded8149287b74667bb2f178b0cf7b9" # pragma: allowlist secret
+    "x-ms-azurevm-os-provisioning.os-image-identity.signer": "f9cce5b7bdc2aaacfc4c78cb2b7515459aded8149287b74667bb2f178b0cf7b9"
   }
-}'
+}
+EOF
+)
 
 type="add"
 
@@ -132,7 +135,7 @@ response=$(curl -s "$server/app/setKeyReleasePolicyClaims" \
   -d "{\"claimType\": \"$type\", \"keyReleaseClaims\": $claims}" \
   -w '\n%{http_code}\n')
 
-echo "$response"
+echo "Set KeyRelease Claims Policy Response: $response"
 
 npm run e2e-inference-test
 

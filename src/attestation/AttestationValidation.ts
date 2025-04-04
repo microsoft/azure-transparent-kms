@@ -12,7 +12,7 @@ import {
   SnpAttestationResult,
 } from "@microsoft/ccf-app/global";
 import { SnpAttestationClaims } from "./SnpAttestationClaims";
-import { keyReleaseMapName } from "../repositories/Maps";
+import { keyReleasePolicyMapName } from "../repositories/Maps";
 import { Logger, LogContext } from "../utils/Logger";
 import { KeyReleasePolicy } from "../policies/KeyReleasePolicy";
 
@@ -127,7 +127,7 @@ export const validateAttestation = (
 
     // Get the key release policy
     const keyReleasePolicy =
-      KeyReleasePolicy.getKeyReleasePolicyFromMap(ccf.kv[keyReleaseMapName]);
+      KeyReleasePolicy.getKeyReleasePolicyFromMap(ccf.kv[keyReleasePolicyMapName]);
     Logger.debug(
       `Key release policy: ${JSON.stringify(
         keyReleasePolicy,

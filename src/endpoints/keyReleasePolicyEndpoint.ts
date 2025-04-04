@@ -4,7 +4,7 @@
 import * as ccfapp from "@microsoft/ccf-app";
 import { ServiceResult } from "../utils/ServiceResult";
 import { enableEndpoint } from "../utils/Tooling";
-import { keyReleaseMapName, keyReleasePolicyMap } from "../repositories/Maps";
+import { keyReleasePolicyMapName, keyReleasePolicyMap } from "../repositories/Maps";
 import { ServiceRequest } from "../utils/ServiceRequest";
 import { KeyReleasePolicy } from "../policies/KeyReleasePolicy";
 import { IKeyReleasePolicy } from "../policies/IKeyReleasePolicy";
@@ -109,7 +109,7 @@ export const keyReleasePolicy = (
 
   try {
     const result = KeyReleasePolicy.getKeyReleasePolicyFromMap(
-      ccf.kv[keyReleaseMapName],
+      ccf.kv[keyReleasePolicyMapName],
       logContext
     );
     console.log(`Key release policy Result: ${JSON.stringify(result)}`, logContext);

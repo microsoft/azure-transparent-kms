@@ -21,7 +21,7 @@ const keyBuf = ccf.strToBuf(key);
 
 /**
  * Endpoint to set the Settings Policy.
- * @param request A CCF request containing the settings olicy.
+ * @param request CCF request containing the settings policy.
  * @returns A ServiceResult indicating success or failure.
  */
 export const setSettingsPolicy = (

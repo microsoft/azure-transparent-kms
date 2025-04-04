@@ -139,5 +139,5 @@ echo "Set KeyRelease Claims Policy Response: $response"
 
 npm run e2e-inference-test
 
-printf "\n\n🏁 Test Completed...\n"
+printf "\n\n Test Completed...\n"
 exit 0

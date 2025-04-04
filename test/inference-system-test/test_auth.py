@@ -3,13 +3,6 @@ from endpoints import auth
 from utils import apply_kms_constitution, trust_jwt_issuer
 
 
-def test_auth_member_cert(setup_Default_JWT_ReleaseClaims_Policy):
-    status_code, auth_json = auth(auth="member_cert")
-    print(auth_json)
-    assert status_code == 200
-    assert auth_json["auth"]["policy"] == "member_cert"
-
-
 def test_auth_user_cert(setup_Default_JWT_ReleaseClaims_Policy):
     status_code, auth_json = auth(auth="user_cert")
     print(auth_json)

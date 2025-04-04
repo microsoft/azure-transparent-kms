@@ -6,8 +6,8 @@
 # Function to display usage instructions
 usage() {
     echo "Usage:"
-    echo "  settings_policy_app_endpt.sh set --policy <settings-json>"
-    echo "  settings_policy_app_endpt.sh get"
+    echo "  settings_policy.sh set --policy <settings-json>"
+    echo "  settings_policy.sh get"
     exit 1
 }
 

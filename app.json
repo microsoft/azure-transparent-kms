@@ -4,9 +4,8 @@
       "get": {
         "js_module": "endpoints/keyReleasePolicyEndpoint.js",
         "js_function": "keyReleasePolicy",
-        "forwarding_required": "sometimes",
+        "forwarding_required": "none",
         "authn_policies": [
-          "member_cert",
           "jwt"
         ],
         "redirection_strategy": "none",
@@ -29,7 +28,7 @@
       "get": {
         "js_module": "endpoints/settingsPolicyEndpoint.js",
         "js_function": "settingsPolicy",
-        "forwarding_required": "sometimes",
+        "forwarding_required": "none",
         "authn_policies": [
           "user_cert",
           "jwt"
@@ -228,7 +227,6 @@
         "forwarding_required": "never",
         "authn_policies": [
           "user_cert",
-          "member_cert",
           "jwt"
         ],
         "mode": "readonly",

@@ -35,7 +35,7 @@ export const setSettingsPolicy = (
     if (isValidIdentity.failure) return isValidIdentity;
 
     const { body } = serviceRequest;
-    if (!body || !body.settings_policy) {
+    if (body === undefined || body.settings_policy === undefined) {
         return ServiceResult.Failed<string>(
             { errorMessage: "Invalid request body: 'set_settings_policy' is required." },
             400,

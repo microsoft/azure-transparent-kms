@@ -47,7 +47,7 @@ keyReleasePolicyClaims() {
         --cert "$KMS_USER_CERT_PATH" \
         --key "$KMS_USER_PRIVK_PATH" \
         -H "Content-Type: application/json" \
-        -d "{\"claimType\": \"$type\", \"claims\": $claims}" \
+         -d "{\"claimType\": \"$type\", \"keyReleaseClaims\": $claims}" \
         -w '\n%{http_code}\n')
     fi
 

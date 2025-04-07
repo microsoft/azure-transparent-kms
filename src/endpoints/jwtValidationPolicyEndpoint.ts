@@ -29,7 +29,7 @@ export const setJwtValidationPolicy = (
     if (isValidIdentity.failure) return isValidIdentity;
 
     const { body } = serviceRequest;
-    if (!body || !body.jwt_validation_policy) {
+    if (body === undefined || body.jwt_validation_policy === undefined) {
         return ServiceResult.Failed<string>(
             { errorMessage: "Invalid request body: 'jwt_validation_policy' is required." },
             400,
@@ -65,7 +65,7 @@ export const removeJwtValidationPolicy = (
     if (isValidIdentity.failure) return isValidIdentity;
 
     const { body } = serviceRequest;
-    if (!body || !body.issuer) {
+    if (body === undefined || body.issuer === undefined) {
         return ServiceResult.Failed<string>(
             { errorMessage: "Invalid request body: 'issuer' is required." },
             400,

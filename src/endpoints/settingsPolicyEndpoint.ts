@@ -21,7 +21,7 @@ const keyBuf = ccf.strToBuf(key);
 
 /**
  * Endpoint to set the Settings Policy.
- * @param request A CCF request containing the settings olicy.
+ * @param request CCF request containing the settings policy.
  * @returns A ServiceResult indicating success or failure.
  */
 export const setSettingsPolicy = (
@@ -35,7 +35,7 @@ export const setSettingsPolicy = (
     if (isValidIdentity.failure) return isValidIdentity;
 
     const { body } = serviceRequest;
-    if (!body || !body.settings_policy) {
+    if (body === undefined || body.settings_policy === undefined) {
         return ServiceResult.Failed<string>(
             { errorMessage: "Invalid request body: 'set_settings_policy' is required." },
             400,

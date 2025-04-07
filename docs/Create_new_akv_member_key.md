@@ -64,12 +64,13 @@ make set-constitution-maa
 make setup-mCCF -->
 ```
 # List public keys
-```
 curl ${KMS_URL}/app/listpubkeys  --cacert $KEYS_DIR/service_cert.pem  -H "Content-Type: application/json" -i  -w '\n'
 ```
-# Show key release policy
+
 ```
+# Show key release policy
 export MAA=""
 export AUTHORIZATION="Bearer $MAA"
 curl ${KMS_URL}/app/keyReleasePolicy --cacert ${KEYS_DIR}/service_cert.pem -H "Authorization:$AUTHORIZATION" -H "Content-Type: application/json" -w '\n' | jq
 AUTHORIZATION: Managed identity supported by KMS JWT policy
+```

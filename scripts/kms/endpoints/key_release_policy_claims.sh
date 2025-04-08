@@ -7,7 +7,7 @@ keyReleasePolicyClaims() {
     # Initialize variables
     local type=""
     local claims=""
-    local signed_bytes=""
+    local coseSigned=""
 
     # Parse arguments passed to the script
     while [[ "$#" -gt 0 ]]; do
@@ -22,7 +22,7 @@ keyReleasePolicyClaims() {
                 shift ;; # Move to the next argument
             --coseSigned)
                 # Store pre-signed COSE bytes if provided
-                signed_bytes="$2"
+                coseSigned="$2"
                 shift ;; # Move to the next argument
             *)
                 # Handle unknown parameters and exit with an error
@@ -33,8 +33,10 @@ keyReleasePolicyClaims() {
     done
 
     # Capture both response body and status code
-    if [ $coseSigned ]; then
+    if [ $coseSigned == "True" ]; then
         # Send the signed payload
+        SCRIPT_DIR=$(dirname -- "$(readlink -f "${BASH_SOURCE}")")
+        file_path="$SCRIPT_DIR/cose_signed_payload"
         response=$(curl -X POST "${KMS_URL}/app/setKeyReleasePolicyClaims" \
             -H "Content-Type: application/cose" \
             --data-binary "@$file_path" \

@@ -39,7 +39,13 @@ def test_keyReleaseClaim_add_remove(setup_kms):
     )
     assert status_code == 200
 
-
+@pytest.mark.parametrize(
+    "setup_Default_JWT_ReleaseClaims_Policy",
+    [{
+        "cose_signed": True,
+    }],
+    indirect=True
+)
 def test_keyReleaseClaim_add_remove_with_operators(setup_kms):
     # Add claims by calling SetKeyRelease Endpoints
     status_code, key_release_json = setKeyReleaseClaims(

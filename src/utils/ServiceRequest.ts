@@ -95,7 +95,7 @@ export class ServiceRequest<T> {
       }
     }
 
-    Logger.debug(`Request:`, this.logContext, JSON.stringify(requestWithoutAuth, null, 2));
+    Logger.info(`Request:`, this.logContext, JSON.stringify(requestWithoutAuth, null, 2));
     this.query = queryParams(request, this.logContext);
 
     try {

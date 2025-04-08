@@ -88,15 +88,15 @@ def setup_Default_JWT_ReleaseClaims_Policy(setup_kms, request):
 
     # Merge KeyRelease Claims overrides if provided
     key_release_claims = {**default_key_release_claims, **overrides.get("key_release_claims", {})}
-    cose_signed = overrides.get("cose_signed", default_cose_signed)
-    if cose_signed:
-        json_payload={"claimType": "claims", "keyReleaseClaims": key_release_claims}
-        # Cose Sign Payload
-        cose_sign_payload("setKeyReleaseClaims", json_payload)
-
     wrapped_claims = {
         "claims": key_release_claims
     }
+
+    cose_signed = overrides.get("cose_signed", default_cose_signed)
+    if cose_signed:
+        json_payload={"claimType": "add", "keyReleaseClaims": wrapped_claims}
+        # Cose Sign Payload
+        cose_sign_payload("setKeyReleaseClaims", json_payload)
 
     # Apply KeyRelease Claims Policy
     status_code, _ = setKeyReleaseClaims(type="add", claims=wrapped_claims, cose_signed=cose_signed)

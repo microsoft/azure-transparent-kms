@@ -109,12 +109,11 @@ export class ServiceRequest<T> {
         // Handle COSE-signed request by parsing the content
         try {
           const caller = request.caller as ccfapp.UserCOSESign1AuthnIdentity;
-          const contentBytes = new Uint8Array(caller.cose.content);
-          const contentString = ccfapp.string.decode(contentBytes);
+          let requestBody = ccf.bufToJsonCompatible(caller.cose.content);
 
           // Parse the JSON content
-          this.body = JSON.parse(contentString) as T;
-          Logger.debug(`Parsed COSE body:`, this.logContext, JSON.stringify(this.body));
+          this.body = requestBody as T;
+          Logger.info(`Parsed COSE body:`, this.logContext, JSON.stringify(this.body));
         } catch (coseError) {
           Logger.error(`Failed to parse COSE content: ${coseError}`, this.logContext);
           this.error = {

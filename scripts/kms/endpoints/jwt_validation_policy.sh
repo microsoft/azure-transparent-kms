@@ -6,7 +6,7 @@
 # Function to display usage instructions
 usage() {
     echo "Usage:"
-    echo "  jwtValidationPolicy.sh set --policy <jwtValidationPolicy-json>"
+    echo "  jwtValidationPolicy.sh set --policy <cose signed jwtValidationPolicy>"
     echo "  jwtValidationPolicy.sh remove --issuer <issuer>"
     exit 1
 }

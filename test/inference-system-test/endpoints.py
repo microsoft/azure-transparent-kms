@@ -86,10 +86,10 @@ def setKeyRotationPolicy(key_rotation_policy: dict):
     if not key_rotation_policy:
         raise ValueError("'key_rotation_policy' is required.")
 
-    key_rotation_policy_json = json.dumps(
-        key_rotation_policy
-    )  # Convert the claims dictionary to a JSON string
-    return call_endpoint("key_rotation_policy", action="set", policy=key_rotation_policy_json)
+    json_payload={"key_rotation_policy": key_rotation_policy}
+    cose_signed_file = cose_sign_payload("setKeyRotationPolicy", json_payload)
+
+    return call_endpoint("key_rotation_policy", action="set", policy=cose_signed_file)
 
 
 def getKeyRotationPolicy():

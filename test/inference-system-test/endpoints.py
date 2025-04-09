@@ -99,13 +99,16 @@ def getKeyRotationPolicy():
 def setJwtValidationPolicy(jwt_validation_policy: dict):
     if not jwt_validation_policy:
         raise ValueError("'jwt_validation_policy' is required.")
-
-    jwt_validation_policy_json = json.dumps(
-        jwt_validation_policy
-    )  # Convert the claims dictionary to a JSON string
+    
+    json_payload={"jwt_validation_policy": jwt_validation_policy}
+    cose_signed_policy = cose_sign_payload("setJwtValidationPolicy", json_payload)
+    
     return call_endpoint(
-        "jwt_validation_policy", action="set", policy=jwt_validation_policy
+        "jwt_validation_policy", action="set", policy=cose_signed_policy
     )
 
 def removeJwtValidationPolicy(issuer: str):
-    return call_endpoint("jwt_validation_policy", action="remove", issuer=issuer)
+    json_payload={"issuer": issuer}
+    cose_signed_policy = cose_sign_payload("removeJwtValidationPolicy", json_payload)
+    
+    return call_endpoint("jwt_validation_policy", action="remove", issuer=cose_signed_policy)

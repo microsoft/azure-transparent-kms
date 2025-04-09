@@ -5,21 +5,11 @@
 
 keyReleasePolicyClaims() {
     # Initialize variables
-    local type=""
-    local claims=""
     local coseSigned=""
 
     # Parse arguments passed to the script
     while [[ "$#" -gt 0 ]]; do
         case $1 in
-            --type)
-                # Store the claim operation type (add/remove)
-                type="$2"
-                shift ;; # Move to the next argument
-            --claims)
-                # Store the JSON string containing the claims
-                claims="$2"
-                shift ;; # Move to the next argument
             --coseSigned)
                 # Store pre-signed COSE bytes if provided
                 coseSigned="$2"
@@ -32,26 +22,13 @@ keyReleasePolicyClaims() {
         shift # Move to the next argument
     done
 
-    # Capture both response body and status code
-    if [ $coseSigned == "True" ]; then
-        # Send the signed payload
-        SCRIPT_DIR=$(dirname -- "$(readlink -f "${BASH_SOURCE}")")
-        file_path="$SCRIPT_DIR/cose_signed_payload"
-        response=$(curl -X POST "${KMS_URL}/app/setKeyReleasePolicyClaims" \
-            -H "Content-Type: application/cose" \
-            --data-binary "@$file_path" \
-            --cacert "${KMS_SERVICE_CERT_PATH}" \
-            -s \
-            -w "\n%{http_code}")
-    else
-        response=$(curl -s "$KMS_URL/app/setKeyReleasePolicyClaims" \
-        --cacert "$KMS_SERVICE_CERT_PATH" \
-        --cert "$KMS_USER_CERT_PATH" \
-        --key "$KMS_USER_PRIVK_PATH" \
-        -H "Content-Type: application/json" \
-         -d "{\"claimType\": \"$type\", \"keyReleaseClaims\": $claims}" \
-        -w '\n%{http_code}\n')
-    fi
+    # Send the signed payload
+    response=$(curl -X POST "${KMS_URL}/app/setKeyReleasePolicyClaims" \
+        -H "Content-Type: application/cose" \
+        --data-binary "@$coseSigned" \
+        --cacert "${KMS_SERVICE_CERT_PATH}" \
+        -s \
+        -w "\n%{http_code}")
 
     # Extract status code (last line)
     status_code=$(echo "$response" | tail -n1)

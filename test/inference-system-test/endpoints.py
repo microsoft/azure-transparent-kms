@@ -6,7 +6,7 @@ REPO_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "..")
 
 import subprocess
 import json
-
+from utils import cose_sign_payload
 
 def call_endpoint(endpoint, **kwargs):
 
@@ -75,9 +75,11 @@ def auth(**kwargs):
 def setKeyReleaseClaims(type: str, claims: dict, cose_signed: bool = False):
     if not type or not claims:
         raise ValueError("Both 'type' and 'claims' are required.")
-
-    claims_json = json.dumps(claims)  # Convert the claims dictionary to a JSON string
-    return call_endpoint("key_release_policy_claims", type=type, claims=claims_json, coseSigned=cose_signed)
+    
+    json_payload={"claimType": type, "keyReleaseClaims": claims}
+    cose_signed_file = cose_sign_payload("setKeyReleaseClaims", json_payload)
+    
+    return call_endpoint("key_release_policy_claims", coseSigned=cose_signed_file)
 
 
 def setKeyRotationPolicy(key_rotation_policy: dict):

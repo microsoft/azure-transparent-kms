@@ -2,7 +2,7 @@ import json
 import os
 import subprocess
 import pytest
-from utils import deploy_app_code, trust_jwt_issuer, cose_sign_payload
+from utils import deploy_app_code, trust_jwt_issuer
 from endpoints import setKeyReleaseClaims, setJwtValidationPolicy
 
 REPO_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -44,7 +44,6 @@ def setup_kms():
 @pytest.fixture(scope="function", autouse=True)
 def setup_Default_JWT_ReleaseClaims_Policy(setup_kms, request):
 
-    default_cose_signed = False
     default_jwt_issuer = "http://Demo-jwt-issuer"
     default_jwt_validation_policy = {
         "iss": default_jwt_issuer,
@@ -92,12 +91,6 @@ def setup_Default_JWT_ReleaseClaims_Policy(setup_kms, request):
         "claims": key_release_claims
     }
 
-    cose_signed = overrides.get("cose_signed", default_cose_signed)
-    if cose_signed:
-        json_payload={"claimType": "add", "keyReleaseClaims": wrapped_claims}
-        # Cose Sign Payload
-        cose_sign_payload("setKeyReleaseClaims", json_payload)
-
     # Apply KeyRelease Claims Policy
-    status_code, _ = setKeyReleaseClaims(type="add", claims=wrapped_claims, cose_signed=cose_signed)
+    status_code, _ = setKeyReleaseClaims(type="add", claims=wrapped_claims)
     assert status_code == 200

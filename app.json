@@ -264,9 +264,7 @@
         "js_function": "setKeyReleasePolicyClaims",
         "forwarding_required": "always",
         "authn_policies": [
-          "user_cert",
-          "user_cose_sign1",
-          "jwt"
+          "user_cose_sign1"
         ],
         "mode": "readwrite",
         "openapi": {

@@ -162,14 +162,11 @@ def cose_sign_payload(
         # Create the COSE-Sign1 payload.
         # This function is assumed to be provided by the CCF framework.
         signed_payload = ccf.cose.create_cose_sign1(serialised_payload, key, cert, phdr)
-
-        print("Current working directory:", os.getcwd())
-        # File Path to save cose_payloads passing them around as bytes across python and shell resulted in CoseErrors in the service
-        file_path = os.path.join("scripts", "kms", "endpoints", "cose_signed_payload")
-        # write this to above path
-        with open(file_path, "wb") as file:
-            file.write(signed_payload)
-        print("Wrote Cose Payload at path: ", file_path)
+        
+        temp_file = tempfile.NamedTemporaryFile(delete=False)
+        temp_file.write(signed_payload)
+        print("Wrote cose signed payload to: ", temp_file.name)
+        return temp_file.name
 
     except FileNotFoundError as e:
         print(f"File not found during signing: {e}")

@@ -61,11 +61,11 @@ def setSettingsPolicy(settings_policy: dict):
     if not settings_policy:
         raise ValueError("'settings_policy' is required.")
 
-    set_settings_policy_json = json.dumps(
-        settings_policy
-    )  # Convert the claims dictionary to a JSON string
+    json_payload={"settings_policy": settings_policy}
+    cose_signed_file = cose_sign_payload("setSettingsPolicy", json_payload)
+
     return call_endpoint(
-        "settings_policy", action="set", policy=set_settings_policy_json
+        "settings_policy", action="set", policy=cose_signed_file
     )
 
 def auth(**kwargs):

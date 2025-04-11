@@ -35,7 +35,7 @@ export const add = (
   claims: IKeyReleasePolicyClaims
 ): void => {
   console.log(`Add claims from key release policy: ${JSON.stringify(claims)}`);
-  map.storeKeyReleaseClaims(claimType, claims);
+  map.storeIndividualClaim(claimType, claims);
 };
 
 // Remove claims from the store

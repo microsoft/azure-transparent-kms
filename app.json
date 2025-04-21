@@ -6,6 +6,8 @@
         "js_function": "keyReleasePolicy",
         "forwarding_required": "never",
         "authn_policies": [
+          "user_cert",
+          "jwt"
         ],
         "redirection_strategy": "none",
         "mode": "readonly",
@@ -261,6 +263,8 @@
         "js_function": "setKeyReleasePolicyClaims",
         "forwarding_required": "always",
         "authn_policies": [
+          "user_cert",
+          "jwt"
         ],
         "mode": "readwrite",
         "openapi": {

@@ -263,7 +263,7 @@
         "js_function": "setKeyReleasePolicyClaims",
         "forwarding_required": "always",
         "authn_policies": [
-          "user_cert",
+          "member_cert",
           "jwt"
         ],
         "mode": "readwrite",

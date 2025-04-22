@@ -77,7 +77,7 @@ demo: stop-all start-host-idp ## 🎬 Demo the KMS Application in the Sandbox
 # Propose the JWT validation policy
 propose-jwt-demo-validation-policy: ## 🚀 Deploy the JWT validation policy
 	@echo -e "\e[34m$@\e[0m" || true
-	@CCF_PLATFORM=${CCF_PLATFORM} ./scripts/submit_proposal.sh --network-url "${KMS_URL}" --proposal-file ./governance/jwt/set_jwt_demo_validation_policy_proposal.json --certificate_dir "${KEYS_DIR}" --member-count ${MEMBER_COUNT}
+	@CCF_PLATFORM=${CCF_PLATFORM} ./scripts/ccf/propose_with_endpoint.sh --network-url "${KMS_URL}" --proposal-file ./governance/jwt/set_jwt_demo_validation_policy_proposal.json --certificate_dir "${KEYS_DIR}" --endpoint "app/setJwtValidationPolicy"
 
 # Propose a new idp
 propose-jwt-ms-validation-policy: ## 🚀 Propose the AAD as idp
@@ -92,9 +92,13 @@ propose-jwt-maa-validation-policy: ## 🚀 Propose MAA as idp
 # Propose a new settings policy
 propose-settings-policy: ## 🚀 Deploy the settings policy
 	@echo -e "\e[34m$@\e[0m" || true
-	@CCF_PLATFORM=${CCF_PLATFORM} ./scripts/submit_proposal.sh --network-url "${KMS_URL}" --proposal-file ./governance/policies/settings-policy.json --certificate_dir "${KEYS_DIR}" --member-count ${MEMBER_COUNT}
+	@CCF_PLATFORM=${CCF_PLATFORM} ./scripts/ccf/propose_with_endpoint.sh --network-url "${KMS_URL}" --proposal-file ./governance/policies/settings-policy.json --certificate_dir "${KEYS_DIR}" --endpoint "app/setSettingsPolicy"
 
 # Propose a new key release policy
+propose-add-key-release-policy: ## 🚀 Deploy the add claim key release policy to the sandbox
+	@echo -e "\e[34m$@\e[0m" || true
+	@CCF_PLATFORM=${CCF_PLATFORM} ./scripts/ccf/propose_with_endpoint.sh --network-url "${KMS_URL}" --proposal-file ./governance/policies/key-release-policy-add.json --certificate_dir "${KEYS_DIR}" --endpoint "app/setKeyReleasePolicyClaims"
+
 propose-add-key-release-policy-maa: ## 🚀 Deploy the add claim key release policy to the sandbox or mCCF
 	@echo -e "\e[34m$@\e[0m" || true
 	@CCF_PLATFORM=${CCF_PLATFORM} ./scripts/submit_proposal.sh --network-url "${KMS_URL}" --proposal-file ./governance/policies/key-release-policy-maa-add.json --certificate_dir "${KEYS_DIR}" --member-count ${MEMBER_COUNT}

@@ -351,7 +351,7 @@
         "openapi": {
           "responses": {
             "200": {
-              "description": "Remove JWT Validation Policy"
+              "description": "Set Key Rotation Policy"
             }
           }
         }
@@ -370,7 +370,7 @@
         "openapi": {
           "responses": {
             "200": {
-              "description": "Remove JWT Validation Policy"
+              "description": "Get Key Rotation Validation Policy"
             }
           }
         }

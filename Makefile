@@ -99,6 +99,10 @@ propose-add-key-release-policy: ## 🚀 Deploy the add claim key release policy 
 	@echo -e "\e[34m$@\e[0m" || true
 	@CCF_PLATFORM=${CCF_PLATFORM} ./scripts/ccf/propose_with_endpoint.sh --network-url "${KMS_URL}" --proposal-file ./governance/policies/key-release-policy-add.json --certificate_dir "${KEYS_DIR}" --endpoint "app/setKeyReleasePolicyClaims"
 
+propose-key-rotation-policy:
+	@echo -e "\e[34m$@\e[0m" || true
+	@CCF_PLATFORM=${CCF_PLATFORM} ./scripts/ccf/propose_with_endpoint.sh --network-url "${KMS_URL}" --proposal-file ./governance/policies/key-rotation-policy.json --certificate_dir "${KEYS_DIR}" --endpoint "app/setKeyRotationPolicy"
+
 propose-add-key-release-policy-maa: ## 🚀 Deploy the add claim key release policy to the sandbox or mCCF
 	@echo -e "\e[34m$@\e[0m" || true
 	@CCF_PLATFORM=${CCF_PLATFORM} ./scripts/submit_proposal.sh --network-url "${KMS_URL}" --proposal-file ./governance/policies/key-release-policy-maa-add.json --certificate_dir "${KEYS_DIR}" --member-count ${MEMBER_COUNT}

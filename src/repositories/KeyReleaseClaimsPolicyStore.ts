@@ -43,9 +43,15 @@ export class KeyReleaseClaimsPolicyStore {
 
     // Store each claim correctly
     claimsKeys.forEach((key) => {
-      const value = claims[key as keyof IKeyReleasePolicyClaims];
+      let value = claims[key as keyof IKeyReleasePolicyClaims];
 
+      //Convert value to array if not already
+      // This is to ensure that we can store multiple values for a single key 
       if (value !== undefined) {
+        if (!Array.isArray(value)) {
+          value = [value];
+      }
+
         // Explicit type assertion ensures no `undefined` issue
         (existingClaims as Record<string, string | number | boolean | object>)[key] = value;
       }

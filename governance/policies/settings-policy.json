@@ -1,17 +1,8 @@
 {
-  "actions": [
-    {
-      "name": "set_settings_policy",
-      "args": {
-        "settings_policy": {
-          "service": {
-            "name": "KMS-AML",
-            "description": "Key Management Service for AML",
-            "version": "1.0.0",
-            "debug": true
-          }
-        }
-      }
-    }
-  ]
+  "settings_policy": {
+    "name": "custom-kms",
+    "description": "Custom Key Management Service",
+    "version": "2.1.0",
+    "debug": true
+  }
 }

@@ -2,7 +2,7 @@ import json
 import os
 import subprocess
 import pytest
-from utils import deploy_app_code, apply_kms_constitution, trust_jwt_issuer
+from utils import deploy_app_code, trust_jwt_issuer
 from endpoints import setKeyReleaseClaims, setJwtValidationPolicy
 
 REPO_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", ".."))

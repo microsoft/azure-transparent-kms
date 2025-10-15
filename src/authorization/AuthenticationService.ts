@@ -9,6 +9,7 @@ import { IValidatorService } from "./IValidationService";
 import { UserCertValidator } from "./certs/UserCertValidator";
 import { MemberCertValidator } from "./certs/MemberCertValidator";
 import { Logger, LogContext } from "../utils/Logger";
+import { UserCoseSignAuthnIdentity } from "./cose/CoseSignValidator";
 
 /**
  * CCF authentication policies
@@ -19,6 +20,7 @@ export enum CcfAuthenticationPolicyEnum {
   Member_cert = "member_cert",
   Member_signature = "member_signature",
   Jwt = "jwt",
+  CoseSigned = "user_cose_sign1",
 }
 
 /**
@@ -42,6 +44,10 @@ export class AuthenticationService implements IAuthenticationService {
       CcfAuthenticationPolicyEnum.Member_cert,
       new MemberCertValidator(this.logContext),
     );
+    this.validators.set(
+      CcfAuthenticationPolicyEnum.CoseSigned,
+      new UserCoseSignAuthnIdentity(this.logContext),
+    );
   }
 
   /*
@@ -55,6 +61,7 @@ export class AuthenticationService implements IAuthenticationService {
       const caller = request.caller as unknown as ccfapp.AuthnIdentityCommon;
       if (!caller) {
         // no caller policy
+        console.log("LOG NO CALLER POLICY");
         return [caller, ServiceResult.Succeeded("", this.logContext)];
       }
       Logger.debug(
@@ -74,7 +81,6 @@ export class AuthenticationService implements IAuthenticationService {
           }, 400, this.logContext),
         ];
       }
-
       return [caller, validator!.validate(request)];
     } catch (ex) {
       return [

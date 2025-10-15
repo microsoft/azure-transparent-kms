@@ -6,7 +6,7 @@
 # Function to display usage instructions
 usage() {
     echo "Usage:"
-    echo "  settings_policy.sh set --policy <settings-json>"
+    echo "  settings_policy.sh set --policy <cose signed settings>"
     echo "  settings_policy.sh get"
     exit 1
 }
@@ -37,32 +37,12 @@ setSettingsPolicy() {
         usage
     fi
 
-    # Check for jq installation and install if missing
-    if ! command -v jq > /dev/null 2>&1; then
-        echo "'jq' is not installed. Attempting to install it now..."
-        
-        sudo apt-get update && sudo apt-get install -y jq
-        if ! command -v jq > /dev/null 2>&1; then
-            echo "Error: 'jq' installation failed. Please install it manually."
-            exit 1
-        fi
-        echo "'jq' installed successfully."
-    fi
-
-    # Validate JSON format
-    if ! echo "$policy" | jq . > /dev/null 2>&1; then
-        echo "Error: Invalid JSON provided for setSettingsPolicy."
-        exit 1
-    fi
-
-    # Send a curl request to the CCF API endpoint
-    response=$(curl -s "$KMS_URL/app/setSettingsPolicy" \
-        --cacert "$KMS_SERVICE_CERT_PATH" \
-        --cert "$KMS_USER_CERT_PATH" \
-        --key "$KMS_USER_PRIVK_PATH" \
-        -H "Content-Type: application/json" \
-        -d "{\"settings_policy\": $policy}" \
-        -w '\n%{http_code}\n')
+    response=$(curl -X POST "${KMS_URL}/app/setSettingsPolicy" \
+        -H "Content-Type: application/cose" \
+        --data-binary "@$policy" \
+        --cacert "${KMS_SERVICE_CERT_PATH}" \
+        -s \
+        -w "\n%{http_code}")
 
     # Extract status code (last line)
     status_code=$(echo "$response" | tail -n1)

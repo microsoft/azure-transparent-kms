@@ -55,8 +55,7 @@
         "js_function": "setSettingsPolicy",
         "forwarding_required": "always",
         "authn_policies": [
-          "user_cert",
-          "jwt"
+          "user_cose_sign1"
         ],
         "mode": "readwrite",
         "openapi": {
@@ -263,8 +262,7 @@
         "js_function": "setKeyReleasePolicyClaims",
         "forwarding_required": "always",
         "authn_policies": [
-          "user_cert",
-          "jwt"
+          "user_cose_sign1"
         ],
         "mode": "readwrite",
         "openapi": {
@@ -311,8 +309,7 @@
         "js_function": "setJwtValidationPolicy",
         "forwarding_required": "always",
         "authn_policies": [
-          "user_cert",
-          "jwt"
+          "user_cose_sign1"
         ],
         "mode": "readwrite",
         "openapi": {
@@ -330,8 +327,7 @@
         "js_function": "removeJwtValidationPolicy",
         "forwarding_required": "always",
         "authn_policies": [
-          "user_cert",
-          "jwt"
+          "user_cose_sign1"
         ],
         "mode": "readwrite",
         "openapi": {
@@ -349,14 +345,13 @@
         "js_function": "setKeyRotationPolicy",
         "forwarding_required": "always",
         "authn_policies": [
-          "user_cert",
-          "jwt"
+          "user_cose_sign1"
         ],
         "mode": "readwrite",
         "openapi": {
           "responses": {
             "200": {
-              "description": "Remove JWT Validation Policy"
+              "description": "Set Key Rotation Policy"
             }
           }
         }
@@ -375,7 +370,7 @@
         "openapi": {
           "responses": {
             "200": {
-              "description": "Remove JWT Validation Policy"
+              "description": "Get Key Rotation Validation Policy"
             }
           }
         }

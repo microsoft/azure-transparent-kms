@@ -7,6 +7,7 @@ import { AuthenticationService } from "../authorization/AuthenticationService";
 import { Logger, LogContext } from "./Logger";
 import { Settings } from "../policies/Settings";
 import { settingsPolicyMap } from "../repositories/Maps";
+import { ccf } from "@microsoft/ccf-app/global";
 
 /**
  * A generic request.
@@ -26,7 +27,6 @@ export class ServiceRequest<T> {
     public logcontext: LogContext | string,
     public request: ccfapp.Request<T>,
   ) {
-
     // Set log context if passed in scope string
     if (typeof logcontext === "string") {
       this.logContext = new LogContext().appendScope(logcontext);
@@ -95,11 +95,38 @@ export class ServiceRequest<T> {
       }
     }
 
-    Logger.debug(`Request:`, this.logContext, JSON.stringify(requestWithoutAuth, null, 2));
+    Logger.info(`Request:`, this.logContext, JSON.stringify(requestWithoutAuth, null, 2));
     this.query = queryParams(request, this.logContext);
 
     try {
-      this.body = request.body.json();
+      // Check if this is a COSE-signed request
+      const isCoseRequest = request.caller &&
+                           (request.caller as any).policy === 'user_cose_sign1' &&
+                           (request.caller as ccfapp.UserCOSESign1AuthnIdentity).cose &&
+                           (request.caller as ccfapp.UserCOSESign1AuthnIdentity).cose.content;
+
+      if (isCoseRequest) {
+        // Handle COSE-signed request by parsing the content
+        try {
+          const caller = request.caller as ccfapp.UserCOSESign1AuthnIdentity;
+          let requestBody = ccf.bufToJsonCompatible(caller.cose.content);
+
+          // Parse the JSON content
+          this.body = requestBody as T;
+          Logger.info(`Parsed COSE body:`, this.logContext, JSON.stringify(this.body));
+        } catch (coseError) {
+          Logger.error(`Failed to parse COSE content: ${coseError}`, this.logContext);
+          this.error = {
+            errorMessage: `${this.logContext.getBaseScope()}: Failed to parse COSE content: ${coseError}`,
+          };
+          this.success = false;
+          return;
+        }
+      } else {
+        // For regular JSON requests, use the body directly
+        this.body = request.body.json();
+      }
+
     } catch (exception) {
       this.error = {
         errorMessage: `${this.logContext.getBaseScope()}: No valid JSON request for ${this.logContext.getFormattedScopeString()}`,

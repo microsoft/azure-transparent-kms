@@ -6,7 +6,7 @@
 # Function to display usage instructions
 usage() {
     echo "Usage:"
-    echo "  keyRotationPolicy.sh set --keyRotationPolicy <keyRotationPolicy-json>"
+    echo "  keyRotationPolicy.sh set --keyRotationPolicy <cose signed keyRotationPolicy>"
     echo "  keyRotationPolicy.sh get"
     exit 1
 }
@@ -37,34 +37,12 @@ setKeyRotationPolicy() {
         usage
     fi
 
-    # Check for jq installation and install if missing
-    if ! command -v jq > /dev/null 2>&1; then
-        echo "'jq' is not installed. Attempting to install it now..."
-        
-        sudo apt-get update && sudo apt-get install -y jq
-
-        # Verify if jq was successfully installed
-        if ! command -v jq > /dev/null 2>&1; then
-            echo "Error: 'jq' installation failed. Please install it manually."
-            exit 1
-        fi
-        echo "'jq' installed successfully."
-    fi
-
-    # Validate JSON format
-    if ! echo "$policy" | jq . > /dev/null 2>&1; then
-        echo "Error: Invalid JSON provided for keyRotationPolicy."
-        exit 1
-    fi
-
-
-    response=$(curl -s "$KMS_URL/app/setKeyRotationPolicy" \
-        --cacert "$KMS_SERVICE_CERT_PATH" \
-        --cert "$KMS_USER_CERT_PATH" \
-        --key "$KMS_USER_PRIVK_PATH" \
-        -H "Content-Type: application/json" \
-        -d "{\"key_rotation_policy\": $policy}" \
-        -w '\n%{http_code}\n')
+    response=$(curl -X POST "${KMS_URL}/app/setKeyRotationPolicy" \
+        -H "Content-Type: application/cose" \
+        --data-binary "@$policy" \
+        --cacert "${KMS_SERVICE_CERT_PATH}" \
+        -s \
+        -w "\n%{http_code}")
 
     # Extract status code (last line)
     status_code=$(echo "$response" | tail -n1)

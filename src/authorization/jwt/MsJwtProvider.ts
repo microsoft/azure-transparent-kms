@@ -53,6 +53,8 @@ export const authorizeJwt = (
     const key = keys[inx];
     const jwtProp = identity?.jwt?.payload[key];
     let compliant = false;
+    console.log(`Key: ${key}, jwtProp: ${jwtProp}`, logContext);
+    console.log(`Policy: ${JSON.stringify(policy)}`, logContext);
 
     // Check if policy[key] is an array
     if (Array.isArray(policy[key])) {

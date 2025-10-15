@@ -1,16 +1,18 @@
 import { ccf } from "@microsoft/ccf-app/global";
 import { Logger, LogContext } from "../../utils/Logger";
 
-const validationPolicyMapName = "public:ccf.gov.policies.jwt_validation";
+const validationPolicyMapName = "public:kms.policies.jwt_validation";
 
 export class JwtValidationPolicyMap {
   public static read(issuer: string, logContextIn? : LogContext): { [key: string]: string } | undefined {
     const logContext = (logContextIn?.clone() || new LogContext()).appendScope("JwtValidationPolicyMap");
     // For testing list all issuers
-    const issuersMap = ccf.kv["public:ccf.gov.jwt.issuers"];
+    const issuersMap = ccf.kv["public:kms.policies.jwt_validation"];
     issuersMap.forEach((v, k) => {
       let issuer = ccf.bufToStr(k);
       let info = ccf.bufToJsonCompatible(v);
+      console.log(`Issuer: ${issuer}`);
+      console.log(`Info: ${JSON.stringify(info)}`);
       Logger.debug(`Issuer: ${issuer}: ${JSON.stringify(info)}`, logContext);
     });
 

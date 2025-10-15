@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 import * as ccfapp from "@microsoft/ccf-app";
+import { ccf } from "@microsoft/ccf-app/global";
 import { ServiceResult } from "../utils/ServiceResult";
 import { IAttestationReport } from "./ISnpAttestationReport";
 import { ISnpAttestation } from "./ISnpAttestation";
@@ -11,7 +12,7 @@ import {
   SnpAttestationResult,
 } from "@microsoft/ccf-app/global";
 import { SnpAttestationClaims } from "./SnpAttestationClaims";
-import { keyReleasePolicyMap } from "../repositories/Maps";
+import { keyReleasePolicyMapName } from "../repositories/Maps";
 import { Logger, LogContext } from "../utils/Logger";
 import { KeyReleasePolicy } from "../policies/KeyReleasePolicy";
 
@@ -126,7 +127,7 @@ export const validateAttestation = (
 
     // Get the key release policy
     const keyReleasePolicy =
-      KeyReleasePolicy.getKeyReleasePolicyFromMap(keyReleasePolicyMap);
+      KeyReleasePolicy.getKeyReleasePolicyFromMap(ccf.kv[keyReleasePolicyMapName]);
     Logger.debug(
       `Key release policy: ${JSON.stringify(
         keyReleasePolicy,
@@ -138,7 +139,7 @@ export const validateAttestation = (
       keyReleasePolicy,
       attestationClaims,
     );
-    return policyValidationResult;
+    return policyValidationResult as ServiceResult<string | IAttestationReport>;
   } catch (exception: any) {
     return ServiceResult.Failed<string>(
       { errorMessage: `Internal error: ${exception.message}` },

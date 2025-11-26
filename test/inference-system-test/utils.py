@@ -7,9 +7,11 @@ import tempfile
 REPO_ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 
-def deploy_app_code():
+def deploy_app_code(include_apptable_endpts=False):
+    
+    exclude_apptable_endpts_flag = "false" if include_apptable_endpts else "true"
     subprocess.run(
-        "scripts/kms/js_app_set.sh",
+        ["scripts/kms/js_app_set.sh", exclude_apptable_endpts_flag],
         cwd=REPO_ROOT,
         check=True,
     )
@@ -59,16 +61,33 @@ def remove_key_release_policy():
         check=True,
     )
 
+def trust_jwt_issuer_prop():
+    subprocess.run(
+        [
+            "scripts/kms/jwt_issuer_trust.sh",
+            "governance/proposals/set_jwt_issuer.json",
+        ],
+        cwd=REPO_ROOT,
+        check=True,
+    )
+    
 
 def trust_jwt_issuer(iss=""):
     command = ["scripts/kms/jwt_issuer_trust.sh"]
     if iss:
         command.extend(["--iss", iss])  # Pass '--iss' and 'iss' as separate arguments
-    subprocess.run(
-        command,
-        cwd=REPO_ROOT,
-        check=True,
-    )
+
+    try:
+        result = subprocess.run(
+            command,
+            cwd=REPO_ROOT,
+            check=True,
+            capture_output=True,  # Capture stdout & stderr
+            text=True  # Ensure output is readable as a string
+        )
+    except subprocess.CalledProcessError as e:
+        print("Command failed!")
+        raise  # Re-raise the error after logging details
     
 
 def get_test_attestation():

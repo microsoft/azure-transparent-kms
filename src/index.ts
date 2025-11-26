@@ -13,3 +13,5 @@ export * from "./endpoints/TinkKey";
 export * from "./policies/IKeyReleasePolicySnpProps";
 export * from "./utils/Tooling";
 export * from "./utils/ServiceResult";
+export * from "./endpoints/jwtValidationPolicyEndpoint"
+export * from "./endpoints/keyRotationPolicyEndpoints"

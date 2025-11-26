@@ -5,8 +5,9 @@ import { IMaaAttestationReport } from "./IMaaAttestationReport";
 import { ServiceResult } from "../utils/ServiceResult";
 import { MaaAttestationClaims } from "./MaaAttestationClaims";
 import { Logger, LogContext } from "../utils/Logger";
-import { keyReleasePolicyMap } from "../repositories/Maps";
+import { keyReleasePolicyMapName } from "../repositories/Maps";
 import { KeyReleasePolicy } from "../policies/KeyReleasePolicy";
+import { ccf } from "@microsoft/ccf-app/global";
 
 export class MaaAttestationValidation {
   private logContext: LogContext;
@@ -15,6 +16,7 @@ export class MaaAttestationValidation {
     this.logContext = (logContext?.clone() || new LogContext()).appendScope("MaaAttestationValidation");
   }
 
+  // @yf23: This should be templatized as well to return the appropriate type 
   public validateAttestation(): ServiceResult<string | IMaaAttestationReport> {
     let errorMessage = "";
     if (!this.jwtIdentity) {
@@ -31,7 +33,7 @@ export class MaaAttestationValidation {
 
     // Get the key release policy
     const keyReleasePolicy =
-      KeyReleasePolicy.getKeyReleasePolicyFromMap(keyReleasePolicyMap, this.logContext);
+      KeyReleasePolicy.getKeyReleasePolicyFromMap(ccf.kv[keyReleasePolicyMapName], this.logContext);
     Logger.debug(
       `Key release policy: ${JSON.stringify(
         keyReleasePolicy,
@@ -44,6 +46,7 @@ export class MaaAttestationValidation {
       attestation,
       this.logContext
     );
-    return policyValidationResult;
+    
+    return policyValidationResult as ServiceResult<string | IMaaAttestationReport>;
   }
 }
